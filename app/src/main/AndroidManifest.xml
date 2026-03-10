@@ -29,23 +29,20 @@
         <activity android:name=".ui.community.CommunityHP" />
         <activity android:name=".ui.community.AsthmaSociety" />
         <activity android:name=".ui.community.CreatePostActivity" />
+        <activity android:name=".useraccount.EditProfileActivity" />
+        <activity android:name=".useraccount.YourAccountActivity" />
+        <activity android:name=".useraccount.EditPasswordActivity" />
+        <activity android:name=".ui.alerts.NotificationsActivity" />
 
 
-<!--        <activity-->
-<!--            android:name=".MainActivity"-->
-<!--            android:exported="true"-->
-<!--            android:theme="@style/Theme.SPOREX_App">-->
-
-
-
-<!--        </activity>-->
+        <activity android:name=".MainActivity" />
 
         <activity
             android:name=".ui.device.DeviceActivity"
             android:exported="true" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".useraccount.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.SPOREX_App">
 
@@ -57,5 +54,6 @@
         </activity>
 
     </application>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
 </manifest>

@@ -120,6 +120,8 @@ class ReplyCreateBody(BaseModel):
     user_name: str
     content: str
 
+# ------------- meghan's settings endpoints -------------
+
 class SettingsModel(BaseModel):
     dark_mode: bool
     notifications_enabled: bool
@@ -130,6 +132,38 @@ class SettingsModel(BaseModel):
 class UpdateSettingsBody(BaseModel):
     email: EmailStr
     settings: SettingsModel
+
+@app.get("/api/settings/{email}")
+async def get_settings(email: str):
+    user = users_col.find_one({"email": email})
+
+    if not user:
+        return JSONResponse(
+            status_code=404,
+            content={"success": False, "message": "User not found"},
+        )
+
+    return {
+        "success": True,
+        "settings": user.get("settings", {})
+    }
+
+@app.put("/api/settings")
+async def update_settings(body: UpdateSettingsBody):
+    result = users_col.update_one(
+        {"email": body.email},
+        {"$set": {"settings": body.settings.dict()}}
+    )
+
+    if result.matched_count == 0:
+        return JSONResponse(
+            status_code=404,
+            content={"success": False, "message": "User not found"},
+        )
+
+    return {"success": True, "message": "Settings updated"}
+
+    
 
 # ---------- Routes ----------
 @app.get("/api/health", response_model=BasicResponse)

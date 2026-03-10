@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.sporex_app.R
 import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.navigation.BottomNavBar
@@ -95,16 +97,24 @@ fun UserSettingsScreen() {
                 verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
 
+
                 Text(
-                    text = "Appearance",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colorResource(id = R.color.sporex_white),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    text = "Appearence",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                SettingsOption("Your Account") { }
+                SettingsOption("Your Account") {
+                    context.startActivity(
+                        android.content.Intent(
+                            context,
+                            YourAccountActivity::class.java
+                        )
+                    )
+                }
 
                 SettingsOption("App Customisation") {
                     showAppCustomisationDialog = true
