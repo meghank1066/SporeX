@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.widget.Toast
 import com.example.sporex_app.network.RegisterRequest
 import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.network.SporexApi
@@ -131,12 +132,31 @@ fun RegisterScreen() {
 
                             if (response.isSuccessful) {
                                 Log.d("REGISTER", "Success: ${response.body()}")
+
+                                Toast.makeText(
+                                    context,
+                                    "Account created successfully!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
                             } else {
                                 Log.e("REGISTER", "Error: ${response.code()}")
+
+                                Toast.makeText(
+                                    context,
+                                    "Registration failed (${response.code()})",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
 
                         } catch (e: Exception) {
                             Log.e("REGISTER", "Exception: ${e.message}")
+
+                            Toast.makeText(
+                                context,
+                                "Something went wrong. Try again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 },
