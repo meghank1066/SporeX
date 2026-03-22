@@ -27,6 +27,11 @@ interface SporexApi {
         @Path("email") email: String
     ): Response<SettingsResponse>
 
+    @POST("api/register")
+    suspend fun registerUser(
+        @Body request: RegisterRequest
+    ): Response<Map<String, Any>>
+
     @PUT("api/settings")
     suspend fun updateSettings(
         @Body request: UpdateSettingsRequest
