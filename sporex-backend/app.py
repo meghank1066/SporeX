@@ -239,10 +239,10 @@ async def login(body: LoginBody):
 
 # keeping already existing users
     if not user.get("is_verified", True):
-    return JSONResponse(
-        status_code=403,
-        content={"success": False, "message": "Please verify your email"}
-    )
+        return JSONResponse(
+            status_code=403,
+            content={"success": False, "message": "Please verify your email"}
+        )
     # (Optional) return basic user info for the app
     return {
         "success": True,
