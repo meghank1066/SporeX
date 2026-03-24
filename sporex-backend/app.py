@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from passlib.context import CryptContext
 from datetime import datetime, timezone
 import random
+import requests
 import smtplib
 from email.mime.text import MIMEText
 from datetime import timedelta
@@ -378,9 +379,8 @@ def generate_otp():
     return str(random.randint(100000, 999999))
 
 
-import requests
 
-import requests
+
 
 def send_otp_email(to_email: str, otp: str):
     api_key = os.getenv("RESEND_API_KEY")
