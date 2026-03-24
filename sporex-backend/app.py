@@ -378,31 +378,32 @@ def generate_otp():
     return str(random.randint(100000, 999999))
 
 
+import requests
+
+import requests
+
 def send_otp_email(to_email: str, otp: str):
-    sender_email = os.getenv("EMAIL_USER")
-    app_password = os.getenv("EMAIL_PASS")
+    api_key = os.getenv("RESEND_API_KEY")
 
-    print("DEBUG EMAIL:", sender_email)
-    print("DEBUG PASS:", "SET" if app_password else "NOT SET")
-
-    subject = "SporeX Email Verification"
-    body = f"Your verification code is: {otp}"
-
-    msg = MIMEText(body)
-    msg["Subject"] = subject
-    msg["From"] = sender_email
-    msg["To"] = to_email
+    print("DEBUG RESEND KEY:", "SET" if api_key else "NOT SET")
 
     try:
-        print("Connecting to SMTP...")
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            print("Starting TLS...")
-            server.starttls()
-            print("Logging in...")
-            server.login(sender_email, app_password)
-            print("Sending email...")
-            server.send_message(msg)
-            print("✅ Email sent successfully")
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": "SporeX <onboarding@resend.dev>",
+                "to": [to_email],
+                "subject": "SporeX Email Verification",
+                "html": f"<p>Your verification code is: <strong>{otp}</strong></p>",
+            },
+        )
+
+        print("Email response:", response.text)
+
     except Exception as e:
         print("❌ Email error:", e)
 # ----------------------------
