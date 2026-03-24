@@ -8,7 +8,8 @@ from pydantic import BaseModel, EmailStr
 from pymongo import MongoClient
 from passlib.context import CryptContext
 from datetime import datetime, timezone
-
+import random
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -181,7 +182,7 @@ async def register(body: RegisterBody):
 
     # 2) Decide username (either from body or from email prefix)
     username = body.username or body.email.split("@")[0]
-
+     otp = generate_otp()
     # 3) Hash the password
     password_hash = hash_password(body.password)
 
@@ -192,19 +193,24 @@ async def register(body: RegisterBody):
         "password_hash": password_hash,
         "role": "member",
         "status": "active",
+        "is_verified": False,
         "created_at": datetime.now(timezone.utc),
 
         "settings": {
         "dark_mode": False,
         "notifications_enabled": True,
         "data_personalisation": True,
+        "otp": otp,
+        "otp_expiry": datetime.now(timezone.utc) + timedelta(minutes=10),
         "app_customisation": {
             "accent_color": "green",
             "layout_style": "default"
         
            }
     }
+
 }
+
 
     if body.name:
         user_doc["name"] = body.name
@@ -228,6 +234,14 @@ async def login(body: LoginBody):
             content={"success": False, "message": "Invalid credentials"},
         )
 
+
+
+# keeping already existing users
+    if not user.get("is_verified", True):
+    return JSONResponse(
+        status_code=403,
+        content={"success": False, "message": "Please verify your email"}
+    )
     # (Optional) return basic user info for the app
     return {
         "success": True,
@@ -353,6 +367,10 @@ async def add_reply(post_id: str, body: ReplyCreateBody):
         "message": "Reply added to post"
     }
 
+
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
 # ----------------------------
 # Settings ENDPOINTS
 # enabling darkmode, profile delete access, log out , navigate to device page

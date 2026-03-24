@@ -64,8 +64,11 @@ class LoginActivity : ComponentActivity() {
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 } else {
-                    val msg = response.body()?.message
-                        ?: "Login failed (${response.code()})"
+                    val msg = when (response.code()) {
+                        403 -> "Please verify your email. Check your inbox."
+                        401 -> "Invalid email or password"
+                        else -> response.body()?.message ?: "Login failed (${response.code()})"
+                    }
 
                     onResult(false, msg)
                 }
