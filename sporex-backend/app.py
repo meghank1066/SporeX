@@ -376,9 +376,11 @@ def generate_otp():
 
 
 def send_otp_email(to_email: str, otp: str):
-
     sender_email = os.getenv("EMAIL_USER")
     app_password = os.getenv("EMAIL_PASS")
+
+    print("DEBUG EMAIL:", sender_email)
+    print("DEBUG PASS:", "SET" if app_password else "NOT SET")
 
     subject = "SporeX Email Verification"
     body = f"Your verification code is: {otp}"
@@ -389,12 +391,15 @@ def send_otp_email(to_email: str, otp: str):
     msg["To"] = to_email
 
     try:
+        print("Connecting to SMTP...")
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            print("Logging in...")
             server.login(sender_email, app_password)
+            print("Sending email...")
             server.send_message(msg)
-            print("Email sent successfully")  # 👈 useful for logs
+            print("✅ Email sent successfully")
     except Exception as e:
-        print("Email error:", e)
+        print("❌ Email error:", e)
 # ----------------------------
 # Settings ENDPOINTS
 # enabling darkmode, profile delete access, log out , navigate to device page
