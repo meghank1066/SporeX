@@ -213,7 +213,7 @@ async def register(body: RegisterBody):
         }
     }
 
-}
+
 
 
     if body.name:
