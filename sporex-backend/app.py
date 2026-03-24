@@ -182,11 +182,12 @@ async def register(body: RegisterBody):
 
     # 2) Decide username (either from body or from email prefix)
     username = body.username or body.email.split("@")[0]
-     otp = generate_otp()
+
     # 3) Hash the password
     password_hash = hash_password(body.password)
 
     # 4) Build document
+    otp = generate_otp()
     user_doc = {
         "email": body.email,
         "username": username,
