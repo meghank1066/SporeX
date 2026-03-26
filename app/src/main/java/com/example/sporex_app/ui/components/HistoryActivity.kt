@@ -144,6 +144,7 @@ class HistoryActivity : ComponentActivity() {
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
+                    //?
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(case.chance, style = MaterialTheme.typography.bodyMedium)
                 }
