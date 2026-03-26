@@ -26,13 +26,13 @@ fun TestConnectionScreen(
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomNavBar(currentScreen = "device") },
-        containerColor = Color.White
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorResource(id = R.color.sporex_green))
+                .background(MaterialTheme.colorScheme.primary)
                 .padding(
                     top = padding.calculateTopPadding(),
                     bottom = padding.calculateBottomPadding(),
@@ -55,15 +55,15 @@ fun TestConnectionScreen(
                 )
 
                 Text(
-                    text = "Online",
+                    text = if (connectionStatus) "Online ✅" else "Offline ❌",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF06FF4B)
+                    color = MaterialTheme.colorScheme.secondary
                 )
 
                 // Card
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF3A3A3A)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -74,37 +74,37 @@ fun TestConnectionScreen(
                         Text(
                             text = "Test Connection",
                             style = MaterialTheme.typography.titleMedium,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Text(
                             text = "Your Connection",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Text(
                             text = "Connection Status: ${if (connectionStatus) "Connected ✅" else "Disconnected ❌"}",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Text(
                             text = "Device Name: $deviceName",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Text(
                             text = "Model: $model",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Text(
                             text = "Firmware Version: $firmwareVersion",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Spacer(Modifier.height(16.dp))
@@ -113,8 +113,8 @@ fun TestConnectionScreen(
                             onClick = onReconnectClick,
                             shape = RoundedCornerShape(50),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Black,
-                                contentColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.onSecondary
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {

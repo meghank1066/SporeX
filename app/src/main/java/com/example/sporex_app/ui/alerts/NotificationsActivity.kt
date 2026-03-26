@@ -26,6 +26,7 @@ import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import androidx.compose.ui.res.colorResource
 import com.example.sporex_app.R
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 
 
 class NotificationsActivity : ComponentActivity() {
@@ -56,11 +57,10 @@ class NotificationsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Trigger a test system notification
         sendTestNotification(this)
 
         setContent {
-            MaterialTheme {
+            SPOREX_AppTheme {
                 NotificationsScreen(notificationsList)
             }
         }
@@ -72,21 +72,13 @@ class NotificationsActivity : ComponentActivity() {
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-                ?: return // safely exit if null
+                ?: return
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
             }
         }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            val channel = NotificationChannel(
-//                channelId,
-//                "Sporex Notifications",
-//                NotificationManager.IMPORTANCE_DEFAULT
-//            )
-//            notificationManager.createNotificationChannel(channel)
-//        }
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info) // must be valid
@@ -105,7 +97,7 @@ fun NotificationsScreen(notifications: List<NotificationItem>) {
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomNavBar(currentScreen = "alerts") },
-        containerColor = colorResource(id = R.color.sporex_green)
+        containerColor = MaterialTheme.colorScheme.primary
     ) { paddingValues ->
 
         LazyColumn(
@@ -130,7 +122,10 @@ fun NotificationCard(notification: NotificationItem) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF1F1F1), RoundedCornerShape(12.dp))
+            .background(
+                MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(12.dp)
+            )
             .padding(16.dp)
     ) {
 
@@ -138,7 +133,7 @@ fun NotificationCard(notification: NotificationItem) {
             text = notification.title,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF333333)
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(modifier = Modifier.height(4.dp))

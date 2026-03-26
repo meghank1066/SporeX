@@ -35,7 +35,7 @@ fun EditDeviceScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF06A546))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(
                     top = padding.calculateTopPadding(),
                     bottom = padding.calculateBottomPadding(),
@@ -50,17 +50,17 @@ fun EditDeviceScreen(
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                // Device name and status
+
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = deviceName,
                         style = MaterialTheme.typography.titleLarge,
-                        color = colorResource(id = R.color.sporex_white)
+                        color = MaterialTheme.colorScheme.onSurface // use theme color instead of colorResource
                     )
                     Text(
                         text = "Online",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF06FF4B)
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
@@ -125,7 +125,7 @@ fun SettingItem(label: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.85f), RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically

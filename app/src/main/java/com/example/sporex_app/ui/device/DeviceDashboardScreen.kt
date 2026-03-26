@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.sporex_app.ui.navigation.BottomNavBar
@@ -26,13 +27,13 @@ fun DeviceDashboardScreen(
 
     Scaffold(
         bottomBar = { BottomNavBar(currentScreen = "device") },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.primary,
 
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateDeviceClick,
-                containerColor = Color.Black,
-                contentColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(50),
                 modifier = Modifier.size(56.dp)
             ) {
@@ -44,7 +45,7 @@ fun DeviceDashboardScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF06A546))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(
                     bottom = padding.calculateBottomPadding(),
                     start = padding.calculateStartPadding(LayoutDirection.Ltr),
@@ -66,12 +67,12 @@ fun DeviceDashboardScreen(
                     Text(
                         text = deviceName,
                         style = MaterialTheme.typography.titleLarge,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onBackground
                     )
 
                     Text(
                         text = "Online",
-                        color = Color(0xFF06FF4B),
+                        color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -81,7 +82,7 @@ fun DeviceDashboardScreen(
                         onClick = { expanded = !expanded },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF3A3A3A)),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -123,8 +124,8 @@ fun DeviceDashboardScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Black,
-                            contentColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text("Manage Device")
@@ -149,51 +150,21 @@ fun StatRow(label: String, value: String, desc: String? = null) {
         ) {
             Text(
                 text = label.uppercase(),
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold),
-                color = Color.White // stronger contrast
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Medium),
-                color = Color(0xFF06FF4B) // optional: highlight key values like Humidity/CO2
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colorScheme.secondary
             )
-        }
-
-        desc?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Normal),
-                color = Color.LightGray,
-                modifier = Modifier.padding(top = 2.dp)
-            )
+            desc?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
         }
     }
 }
-
-
-//@Composable
-//fun StatRow(label: String, value: String, desc: String? = null) {
-//    Column(
-//        Modifier
-//            .fillMaxWidth()
-//            .padding(vertical = 6.dp)
-//    ) {
-//        Text(
-//            text = label.uppercase(),
-//            style = MaterialTheme.typography.bodySmall,
-//            color = Color.White
-//        )
-//        Text(
-//            text = value,
-//            style = MaterialTheme.typography.bodyLarge,
-//            color = Color.White
-//        )
-//        desc?.let {
-//            Text(
-//                text = it,
-//                style = MaterialTheme.typography.bodySmall,
-//                color = Color.LightGray
-//            )
-//        }
-//    }
-//}

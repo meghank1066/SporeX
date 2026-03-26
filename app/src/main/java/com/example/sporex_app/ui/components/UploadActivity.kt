@@ -10,19 +10,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.*
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.background
-import androidx.compose.ui.graphics.Color
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.LayoutDirection
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 
 
 class UploadActivity : ComponentActivity() {
@@ -30,42 +27,33 @@ class UploadActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val context = this@UploadActivity
+            SPOREX_AppTheme {
+                val context = this@UploadActivity
 
-            Scaffold(
-                bottomBar = { BottomNavBar(currentScreen = "camera") },
-                containerColor = Color.White
-            ) { paddingValues ->
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFF06A546)) // FULL SCREEN GREEN
-                        .padding(
-                            bottom = paddingValues.calculateBottomPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                        )
-                ) {
-
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        TopBar()
-
-                        // UploadScreen sits inside the green background
-                        UploadScreen(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(24.dp),
-                            onBack = { finish() },
-                            onNext = { uri ->
-                                val intent = Intent(context, ConfirmationActivity::class.java)
-                                intent.putExtra("imageUri", uri.toString())
-                                startActivity(intent)
-                            }
-                        )
-                    }
+                Scaffold(
+                    topBar = {
+                         Surface(color = MaterialTheme.colorScheme.surface) {
+                            TopBar()
+                        }
+                    },
+                    bottomBar = {
+                         Surface(color = MaterialTheme.colorScheme.surface) {
+                            BottomNavBar(currentScreen = "camera")
+                        }
+                    },
+                     containerColor = MaterialTheme.colorScheme.primary,
+                ) { paddingValues ->
+                    UploadScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        onBack = { finish() },
+                        onNext = { uri ->
+                            val intent = Intent(context, ConfirmationActivity::class.java)
+                            intent.putExtra("imageUri", uri.toString())
+                            startActivity(intent)
+                        }
+                    )
                 }
             }
         }
@@ -79,7 +67,6 @@ fun UploadScreen(
     onNext: (Uri) -> Unit
 ) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri -> selectedImageUri = uri }
@@ -87,43 +74,38 @@ fun UploadScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF06A546)), // green background
+            .padding(24.dp),
         contentAlignment = Alignment.TopCenter
     ) {
-
-        // Black rounded container
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 24.dp),
-            color = Color.Black,
+                .padding(horizontal = 10.dp, vertical = 10.dp),
+            color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(30.dp)
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 // Back button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
                     TextButton(onClick = onBack) {
-                        Text("← Back", color = Color.White)
+                        Text("← Back", color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
 
                 Spacer(Modifier.height(10.dp))
 
-                // Title & instructions
                 Text(
                     "Upload Mould Image",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -131,18 +113,20 @@ fun UploadScreen(
                 Text(
                     "Tap the box below to choose a photo from your device. Make sure the mould is clearly visible.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.85f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
 
                 Spacer(Modifier.height(24.dp))
 
-                // White upload card
+                // Upload Box Card
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(220.dp),
                     shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    ),
                     onClick = { launcher.launch("image/*") }
                 ) {
                     Box(
@@ -154,13 +138,13 @@ fun UploadScreen(
                                 Text(
                                     "Tap to upload a photo",
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Spacer(Modifier.height(6.dp))
                                 Text(
                                     "Supported formats: JPG or PNG",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                                 )
                             }
                         } else {
@@ -180,7 +164,7 @@ fun UploadScreen(
                     Text(
                         "Image selected. Press Continue to proceed.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -194,11 +178,12 @@ fun UploadScreen(
                         .height(52.dp),
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        disabledContainerColor = Color.White.copy(alpha = 0.4f)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                     )
                 ) {
-                    Text("Continue", color = Color.Black)
+                    Text("Continue")
                 }
             }
         }

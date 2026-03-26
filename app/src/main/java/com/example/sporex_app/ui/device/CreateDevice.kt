@@ -21,8 +21,7 @@ fun CreateDeviceScreen(
 ) {
     var isScanning by remember { mutableStateOf(false) }
 
-    // Temporary mock device list (replace with real Bluetooth scan results later)
-    var devices by remember {
+   var devices by remember {
         mutableStateOf(listOf<String>())
     }
 
@@ -30,7 +29,7 @@ fun CreateDeviceScreen(
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomNavBar(currentScreen = "device") },
-        containerColor = Color(0xFF06A546)
+        containerColor = MaterialTheme.colorScheme.primary
     ) { padding ->
 
         Column(
@@ -44,14 +43,14 @@ fun CreateDeviceScreen(
             Text(
                 text = "Connect a Device",
                 style = MaterialTheme.typography.titleLarge,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
             Spacer(Modifier.height(12.dp))
 
             Text(
                 text = "Turn on your device and tap scan to find it.",
-                color = Color.White.copy(alpha = 0.8f),
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -61,7 +60,6 @@ fun CreateDeviceScreen(
                 onClick = {
                     isScanning = true
 
-                    // Mock scan results (replace with real Bluetooth scan)
                     devices = listOf(
                         "Sporex Sensor A",
                         "Sporex Sensor B",
@@ -70,8 +68,8 @@ fun CreateDeviceScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
                 )
             ) {
                 Text(if (isScanning) "Scanning..." else "Scan for Devices")
@@ -89,17 +87,16 @@ fun CreateDeviceScreen(
                                 .fillMaxWidth()
                                 .padding(vertical = 6.dp)
                                 .clickable {
-                                    // User selects device → create it
                                     onCreateClick(device)
                                 },
                             colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF3A3A3A)
+                                containerColor = MaterialTheme.colorScheme.surface
                             )
                         ) {
                             Text(
                                 text = device,
                                 modifier = Modifier.padding(16.dp),
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }

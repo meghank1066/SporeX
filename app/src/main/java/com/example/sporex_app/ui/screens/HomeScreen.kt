@@ -27,7 +27,6 @@ fun HomeScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-//            .background(Color(0xFF06A546))
             .background(MaterialTheme.colorScheme.primary)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -36,8 +35,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Surface(
-                modifier = Modifier.fillMaxSize(),
-//                color = Color(0xFF06A546),
+                modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)
             ) {
@@ -46,11 +44,9 @@ fun HomeScreen(
                         .fillMaxSize()
                         .padding(top = 16.dp, bottom = 12.dp)
                 ) {
-//                    Spacer(Modifier.height(16.dp))
 
                     Text(
                         text = "Welcome Back!",
-//                        color = Color.White,
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineLarge,
@@ -65,7 +61,6 @@ fun HomeScreen(
 
                     Text(
                         text = "Scan For Mould",
-//                        color = Color.White,
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineLarge,
@@ -81,8 +76,6 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .height(50.dp),
                         colors = ButtonDefaults.buttonColors(
-//                            containerColor = Color.White,
-//                            contentColor = Color.Black
                             containerColor = MaterialTheme.colorScheme.surface,
                             contentColor = MaterialTheme.colorScheme.onSurface
                         )
@@ -115,7 +108,6 @@ private fun CameraCard(onUploadClick: () -> Unit) {
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             )
-//            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -124,7 +116,6 @@ private fun CameraCard(onUploadClick: () -> Unit) {
                 Icon(
                     imageVector = Icons.Filled.CameraAlt,
                     contentDescription = "Camera",
-//                    tint = Color.Black,
                     tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(120.dp)
                 )
@@ -145,7 +136,6 @@ private fun PreviousCaseCard(onClick: () -> Unit) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
-//        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
@@ -180,8 +170,6 @@ private fun PreviousCaseCard(onClick: () -> Unit) {
                     text = "Click for more information",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall
-//                    color = Color(0xFF06A546),
-//                    style = MaterialTheme.typography.bodySmall
                 )
             }
 
@@ -194,7 +182,6 @@ private fun PreviousCaseCard(onClick: () -> Unit) {
                 Icon(
                     imageVector = Icons.Filled.PlayArrow,
                     contentDescription = "View Case",
-//                    tint = Color.White
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }

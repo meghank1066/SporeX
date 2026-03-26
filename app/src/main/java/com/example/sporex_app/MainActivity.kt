@@ -11,8 +11,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.sporex_app.ui.navigation.BottomNavBar
-import com.example.sporex_app.ui.screens.MainScreen
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import android.content.Intent
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.example.sporex_app.ui.components.UploadActivity
+import com.example.sporex_app.ui.components.ProductsActivity
+import com.example.sporex_app.ui.components.HistoryActivity
+import com.example.sporex_app.ui.screens.HomeScreen
+import com.example.sporex_app.utils.isDarkMode
+import com.example.sporex_app.utils.setDarkMode
 
 class MainActivity : ComponentActivity() {
 
@@ -23,18 +33,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            var isDarkMode by remember {mutableStateOf(false)}
+            val context = LocalContext.current
+            var isDarkMode by remember { mutableStateOf(isDarkMode(context)) } // ← read from prefs
 
-            SPOREX_AppTheme (darkTheme = isDarkMode)
-            {
-
+            SPOREX_AppTheme(darkTheme = isDarkMode) {
                 Scaffold(
+                    containerColor = MaterialTheme.colorScheme.background,
                     bottomBar = { BottomNavBar(currentScreen = "home") }
-                ) { innerPadding ->
-                    MainScreen(
-                        paddingValues = innerPadding,
-                        isDarkMode = isDarkMode,
-                        onThemeChange = { isDarkMode = it})
+                ) {
+                    HomeScreen(
+                        modifier = Modifier,
+                        onUploadClick = {
+                            context.startActivity(Intent(context, UploadActivity::class.java))
+                        },
+                        onProductsClick = {
+                            context.startActivity(Intent(context, ProductsActivity::class.java))
+                        },
+                        onHistoryClick = {
+                            context.startActivity(Intent(context, HistoryActivity::class.java))
+                        }
+                    )
                 }
             }
         }

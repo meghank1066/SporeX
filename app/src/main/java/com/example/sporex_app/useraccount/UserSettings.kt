@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sporex_app.R
 import com.example.sporex_app.network.RetrofitClient
+import com.example.sporex_app.utils.setDarkMode
+import com.example.sporex_app.utils.isDarkMode
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
@@ -29,19 +31,27 @@ class UserSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SPOREX_AppTheme {
-                UserSettingsScreen()
+            var isDarkMode by remember { mutableStateOf(false) }
+
+            SPOREX_AppTheme(darkTheme = isDarkMode) {
+                UserSettingsScreen(
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = { isDarkMode = it }
+                )
             }
         }
     }
 }
 
+
 @Composable
-fun UserSettingsScreen() {
+fun UserSettingsScreen(
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean) -> Unit
+) {
 
     val context = LocalContext.current
 
-    var isDarkMode by remember { mutableStateOf(false) }
     var isNotificationsEnabled by remember { mutableStateOf(false) }
     var isDataPersonalisationEnabled by remember { mutableStateOf(false) }
 
@@ -63,7 +73,7 @@ fun UserSettingsScreen() {
             if (response.isSuccessful) {
                 val settings = response.body()?.settings
                 settings?.let {
-                    isDarkMode = it.dark_mode
+                    onDarkModeChange(it.dark_mode)
                     isNotificationsEnabled = it.notifications_enabled
                     isDataPersonalisationEnabled = it.data_personalisation
                 }
@@ -76,7 +86,8 @@ fun UserSettingsScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.sporex_green))
+            .background(MaterialTheme.colorScheme.background)
+
     ) {
         Scaffold(
             topBar = { TopBar() },
@@ -90,20 +101,20 @@ fun UserSettingsScreen() {
                     .padding(horizontal = 16.dp, vertical = 24.dp)
                     .fillMaxSize()
                     .background(
-                        color = colorResource(id = R.color.sporex_black),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = MaterialTheme.shapes.medium
-                    )
+            )
                     .padding(vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
-
 
                 Text(
                     text = "Appearance",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .padding(start = 16.dp, bottom = 8.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -151,14 +162,16 @@ fun UserSettingsScreen() {
                     )
                     Switch(
                         checked = isDarkMode,
-                        onCheckedChange = { isDarkMode = it }
+                        onCheckedChange = { enabled ->
+                            onDarkModeChange(enabled)
+                            setDarkMode(context, enabled)
+                        }
                     )
                 }
             }
         )
     }
 
-    // ---------- DATA PERSONALISATION MODAL ----------
     if (showDataDialog) {
         AlertDialog(
             onDismissRequest = { showDataDialog = false },
@@ -219,13 +232,13 @@ fun SettingsOption(label: String, onClick: () -> Unit) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
-            color = colorResource(id = R.color.sporex_white),
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.weight(1f)
         )
         Icon(
             imageVector = Icons.Default.ArrowForward,
             contentDescription = "Go to $label",
-            tint = colorResource(id = R.color.sporex_white)
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }

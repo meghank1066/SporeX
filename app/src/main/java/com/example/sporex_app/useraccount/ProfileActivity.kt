@@ -39,6 +39,7 @@ import com.example.sporex_app.ui.device.DeviceActivity
 import com.example.sporex_app.ui.navigation.TopBar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
+import com.example.sporex_app.utils.isDarkMode
 
 class ProfileActivity : ComponentActivity() {
 
@@ -60,15 +61,18 @@ class ProfileActivity : ComponentActivity() {
         usernameState = intent.getStringExtra("username") ?: "User"
 
         setContent {
-            SPOREX_AppTheme {
+            val context = this
+            var darkMode by remember { mutableStateOf(isDarkMode(context)) } // read saved setting
+
+            SPOREX_AppTheme(darkTheme = darkMode) {
                 ProfileScreen(
                     username = usernameState,
-                    onHistoryClick = { startActivity(Intent(this, HistoryActivity::class.java)) },
-                    onPostsClick = { startActivity(Intent(this, CommunityHP::class.java)) },
-                    onDeviceClick = { startActivity(Intent(this, DeviceActivity::class.java)) },
-                    onSettingsClick = { startActivity(Intent(this, UserSettings::class.java)) },
+                    onHistoryClick = { startActivity(Intent(context, HistoryActivity::class.java)) },
+                    onPostsClick = { startActivity(Intent(context, CommunityHP::class.java)) },
+                    onDeviceClick = { startActivity(Intent(context, DeviceActivity::class.java)) },
+                    onSettingsClick = { startActivity(Intent(context, UserSettings::class.java)) },
                     onEditProfileClick = {
-                        val intent = Intent(this, EditProfileActivity::class.java)
+                        val intent = Intent(context, EditProfileActivity::class.java)
                         intent.putExtra("username", usernameState)
                         editProfileLauncher.launch(intent)
                     }
@@ -94,13 +98,13 @@ fun ProfileScreen(
 ) {
     Scaffold(
         bottomBar = { BottomNavBar(currentScreen = "profile") },
-        containerColor = Color.Transparent
+        containerColor = MaterialTheme.colorScheme.primary
     ) { padding ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorResource(id = R.color.sporex_green))
+//                .background(MaterialTheme.colorScheme.primary)
                 .padding(
                     bottom = padding.calculateBottomPadding(),
                     start = padding.calculateStartPadding(LayoutDirection.Ltr),
@@ -112,12 +116,7 @@ fun ProfileScreen(
 
                 TopBar()
 
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp),
-                    color = Color.Transparent
-                ) {
+
                     ProfileContent(
                         username = username,
                         onHistoryClick = onHistoryClick,
@@ -130,7 +129,7 @@ fun ProfileScreen(
             }
         }
     }
-}
+
 
 @Composable
 private fun ProfileContent(
@@ -162,19 +161,18 @@ private fun ProfileContent(
                     .clip(CircleShape)
             )
 
-            // Edit Button Overlay
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(colorResource(id = R.color.sporex_black))
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onEditProfileClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit Profile",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -184,7 +182,7 @@ private fun ProfileContent(
         Text(
             text = username,
             style = MaterialTheme.typography.titleLarge,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -228,7 +226,7 @@ private fun ProfileActionCard(
             .width(160.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
-        color = Color(0xFFF2F2F2),
+        color = MaterialTheme.colorScheme.surface,
         tonalElevation = 2.dp
     ) {
         Column(
@@ -242,13 +240,13 @@ private fun ProfileActionCard(
                 imageVector = icon,
                 contentDescription = label,
                 modifier = Modifier.size(56.dp),
-                tint = Color(0xFF08A045)
+                tint = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(16.dp))
             Text(
                 label,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )}
     }
 }
