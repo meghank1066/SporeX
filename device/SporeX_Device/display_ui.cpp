@@ -15,7 +15,7 @@ static Adafruit_SH1107 display(
 );
 
 bool displayInit() {
-  // Ensure SPI uses your chosen pins (safe on ESP32)
+
   SPI.begin(OLED_CLK, -1, OLED_MOSI, OLED_CS);
 
   if (!display.begin()) {
@@ -23,7 +23,7 @@ bool displayInit() {
     return false;
   }
 
-  display.setRotation(0); // try 1/2/3 if orientation is wrong
+  display.setRotation(0); 
   display.clearDisplay();
   display.display();
   return true;
