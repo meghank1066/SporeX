@@ -44,7 +44,7 @@ class TestConnectionScreenTest {
 
         // Checks for the specific emoji and text defined in the Composable
         composeRule.onNodeWithText("Connection Status: Connected ✅").assertIsDisplayed()
-        composeRule.onNodeWithText("Online").assertIsDisplayed()
+        composeRule.onNodeWithText("Online ✅").assertIsDisplayed()
     }
 
     @Test

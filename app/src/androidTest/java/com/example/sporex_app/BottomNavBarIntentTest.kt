@@ -13,6 +13,8 @@ import com.example.sporex_app.ui.components.UploadActivity
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.useraccount.ProfileActivity
 import com.example.sporex_app.ui.device.DeviceActivity
+import com.example.sporex_app.ui.community.CommunityHP
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -37,29 +39,56 @@ class BottomNavBarIntentTest {
 
     @Test
     fun clickingHome_launchesMainActivity() {
-        composeRule.setContent { BottomNavBar(currentScreen = "devices") }
-        composeRule.onNodeWithContentDescription("home").performClick()
+        composeRule.setContent {
+            SPOREX_AppTheme {
+                BottomNavBar(currentScreen = "devices")
+            }
+        }
+        composeRule.onNodeWithContentDescription("Home").performClick()
         intended(hasComponent(MainActivity::class.java.name))
     }
 
     @Test
     fun clickingDevices_launchesDeviceActivity() {
-        composeRule.setContent { BottomNavBar(currentScreen = "home") }
-        composeRule.onNodeWithContentDescription("devices").performClick()
+        composeRule.setContent {
+            SPOREX_AppTheme {
+                BottomNavBar(currentScreen = "home")
+            }
+        }
+        composeRule.onNodeWithContentDescription("Devices").performClick()
         intended(hasComponent(DeviceActivity::class.java.name))
     }
 
     @Test
     fun clickingCamera_launchesUploadActivity() {
-        composeRule.setContent { BottomNavBar(currentScreen = "home") }
-        composeRule.onNodeWithContentDescription("camera").performClick()
+        composeRule.setContent {
+            SPOREX_AppTheme {
+                BottomNavBar(currentScreen = "home")
+            }
+        }
+        composeRule.onNodeWithContentDescription("Camera").performClick()
         intended(hasComponent(UploadActivity::class.java.name))
     }
 
     @Test
+    fun clickingCommunity_launchesCommunityHP() {
+        composeRule.setContent {
+            SPOREX_AppTheme {
+                BottomNavBar(currentScreen = "home")
+            }
+        }
+        composeRule.onNodeWithContentDescription("Community").performClick()
+        intended(hasComponent(CommunityHP::class.java.name))
+    }
+
+    @Test
     fun clickingProfile_launchesProfileActivity() {
-        composeRule.setContent { BottomNavBar(currentScreen = "home") }
-        composeRule.onNodeWithContentDescription("profile").performClick()
+        composeRule.setContent {
+            SPOREX_AppTheme {
+                BottomNavBar(currentScreen = "home")
+            }
+        }
+        composeRule.onNodeWithContentDescription("Profile").performClick()
         intended(hasComponent(ProfileActivity::class.java.name))
     }
 }

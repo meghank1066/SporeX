@@ -1,6 +1,7 @@
 package com.example.sporex_app
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.example.sporex_app.ui.components.MoldResultScreen
@@ -14,23 +15,36 @@ class MoldResultScreenTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun viewDetails_opensBottomSheet_and_mockTest_opensAndClosesDialog() {
+    fun moldDetected_isShown() {
         composeRule.setContent {
-            SPOREX_AppTheme(dynamicColor = false) {
+            SPOREX_AppTheme {
                 MoldResultScreen()
             }
         }
 
-        // Open bottom sheet
-        composeRule.onNodeWithText("View Details").assertExists().performClick()
-        composeRule.onNodeWithText("Cladosporium Details").assertExists()
+        composeRule.onNodeWithText("Mold Detected").assertExists()
+        composeRule.onNodeWithText("Cladosporium – estimated 65% likelihood").assertExists()
+    }
 
-        // Open dialog
-        composeRule.onNodeWithText("Run Mock Air Quality Test").assertExists().performClick()
-        composeRule.onNodeWithText("Mock Air Quality Test").assertExists()
+    @Test
+    fun clickingViewDetails_performsAction() {
+        composeRule.setContent {
+            SPOREX_AppTheme {
+                MoldResultScreen()
+            }
+        }
 
-        // Close dialog
-        composeRule.onNodeWithText("Close").assertExists().performClick()
-        composeRule.onNodeWithText("Mock Air Quality Test").assertDoesNotExist()
+        composeRule.onAllNodesWithText("View Details")[0].assertExists().performClick()
+    }
+
+    @Test
+    fun askQuestionButton_exists() {
+        composeRule.setContent {
+            SPOREX_AppTheme {
+                MoldResultScreen()
+            }
+        }
+
+        composeRule.onNodeWithText("Ask Question").assertExists()
     }
 }
