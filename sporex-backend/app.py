@@ -325,25 +325,54 @@ async def create_post(body: PostCreateBody):
 
 @app.get("/api/posts")
 async def list_posts():
-    """Get all posts"""
-    posts = list(posts_col.find({}, {"_id": 0}))
+    posts = []
+    for post in posts_col.find():
+        replies = []
+        for reply in post.get("replies", []):
+            replies.append({
+                "user_name": reply.get("user_name", ""),
+                "content": reply.get("content", ""),
+                "created_at": reply.get("created_at").isoformat() if reply.get("created_at") else None
+            })
+
+        posts.append({
+            "id": str(post["_id"]),
+            "user_name": post.get("user_name", ""),
+            "post_name": post.get("post_name", ""),
+            "content": post.get("content", ""),
+            "created_at": post.get("created_at").isoformat() if post.get("created_at") else None,
+            "replies": replies
+        })
     return posts
+
 
 @app.get("/api/posts/{post_id}")
 async def get_post(post_id: str):
-    """Get a specific post by ID"""
     from bson import ObjectId
     try:
-        post = posts_col.find_one(
-            {"_id": ObjectId(post_id)},
-            {"_id": 0}
-        )
+        post = posts_col.find_one({"_id": ObjectId(post_id)})
     except:
         raise HTTPException(status_code=400, detail="Invalid post ID")
-    
+
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    return post
+
+    replies = []
+    for reply in post.get("replies", []):
+        replies.append({
+            "user_name": reply.get("user_name", ""),
+            "content": reply.get("content", ""),
+            "created_at": reply.get("created_at").isoformat() if reply.get("created_at") else None
+        })
+
+    return {
+        "id": str(post["_id"]),
+        "user_name": post.get("user_name", ""),
+        "post_name": post.get("post_name", ""),
+        "content": post.get("content", ""),
+        "created_at": post.get("created_at").isoformat() if post.get("created_at") else None,
+        "replies": replies
+    }
 
 @app.post("/api/posts/{post_id}/replies", response_model=BasicResponse)
 async def add_reply(post_id: str, body: ReplyCreateBody):

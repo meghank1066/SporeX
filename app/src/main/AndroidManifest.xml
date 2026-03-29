@@ -36,14 +36,14 @@
         <activity android:name=".ui.components.HistoryActivity" />
         <activity android:name=".ui.device.DeviceActivity" />
 
-<!--        <activity android:name=".MainActivity" />-->
+<activity android:name=".MainActivity" />
 
 
 
         <!--            android:name=".useraccount.LoginActivity"-->
 
         <activity
-            android:name=".MainActivity"
+            android:name=".useraccount.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.SPOREX_App">
 

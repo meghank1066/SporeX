@@ -12,16 +12,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sporex_app.R
+import com.example.sporex_app.network.CreatePostRequest
+import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
-import android.content.Intent
-import androidx.compose.ui.platform.LocalContext
+import com.example.sporex_app.useraccount.UserSession
+import kotlinx.coroutines.launch
 
 class CreatePostActivity : ComponentActivity() {
 
@@ -29,14 +32,11 @@ class CreatePostActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-
             SPOREX_AppTheme {
-
                 Scaffold(
                     topBar = { TopBar() },
                     bottomBar = { BottomNavBar(currentScreen = "community") }
                 ) { padding ->
-
                     CreatePostScreen(
                         modifier = Modifier.padding(padding)
                     )
@@ -50,8 +50,15 @@ class CreatePostActivity : ComponentActivity() {
 fun CreatePostScreen(
     modifier: Modifier = Modifier
 ) {
-
     var postContent by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val scope = rememberCoroutineScope()
+
+    val currentUsername = UserSession.getUsername(context)
 
     Column(
         modifier = modifier
@@ -96,7 +103,10 @@ fun CreatePostScreen(
 
                 OutlinedTextField(
                     value = postContent,
-                    onValueChange = { postContent = it },
+                    onValueChange = {
+                        postContent = it
+                        if (error != null) error = null
+                    },
                     placeholder = {
                         Text(
                             "Share your mold experience or ask for advice...",
@@ -113,22 +123,47 @@ fun CreatePostScreen(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                if (error != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = error ?: "",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
 
-                val context = LocalContext.current
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
                     onClick = {
-                        val activity = context as? Activity ?: return@Button
+                        if (activity == null) return@Button
 
-                        val resultIntent = Intent().apply {
-                            putExtra("post_content", postContent)
+                        scope.launch {
+                            loading = true
+                            error = null
+
+                            try {
+                                val res = RetrofitClient.api.createPost(
+                                    CreatePostRequest(
+                                        user_name = currentUsername,
+                                        post_name = "Community Post",
+                                        content = postContent.trim()
+                                    )
+                                )
+
+                                if (res.isSuccessful) {
+                                    activity.setResult(Activity.RESULT_OK)
+                                    activity.finish()
+                                } else {
+                                    error = "Failed to create post (${res.code()})"
+                                }
+                            } catch (e: Exception) {
+                                error = "Network error: ${e.localizedMessage ?: "Unknown error"}"
+                            } finally {
+                                loading = false
+                            }
                         }
-
-                        activity.setResult(Activity.RESULT_OK, resultIntent)
-                        activity.finish()
                     },
-                    enabled = postContent.isNotBlank(),
+                    enabled = postContent.isNotBlank() && !loading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -138,7 +173,15 @@ fun CreatePostScreen(
                         contentColor = colorResource(id = R.color.sporex_white)
                     )
                 ) {
-                    Text("Post")
+                    if (loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = colorResource(id = R.color.sporex_white)
+                        )
+                    } else {
+                        Text("Post")
+                    }
                 }
             }
         }

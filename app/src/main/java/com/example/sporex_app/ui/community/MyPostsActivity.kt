@@ -16,12 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.sporex_app.network.PostResponse
+import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.navigation.BottomNavBar
-import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import com.example.sporex_app.ui.navigation.TopBar
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.useraccount.UserSession
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MyPostsActivity : ComponentActivity() {
@@ -51,20 +55,88 @@ class MyPostsActivity : ComponentActivity() {
 
 @Composable
 fun MyPostsScreen() {
-    val posts = remember {
-        mutableStateListOf(
-            Post(1, "You", "Just found some mold behind the couch 😱", "2h ago")
-        )
+    var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+    val currentUsername = UserSession.getUsername(context)
+
+    LaunchedEffect(Unit) {
+        try {
+            val res = RetrofitClient.api.getPosts()
+            if (res.isSuccessful) {
+                posts = res.body().orEmpty()
+            } else {
+                error = "Failed to load posts (${res.code()})"
+            }
+        } catch (e: Exception) {
+            error = "Network error: ${e.localizedMessage ?: "Unknown error"}"
+        } finally {
+            loading = false
+        }
     }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        items(posts) { post ->
-            PostCardModern(post)
+    val myPosts = posts
+        .filter { it.user_name == currentUsername }
+        .map { backendPost ->
+            Post(
+                id = backendPost.id.hashCode(),
+                author = backendPost.user_name,
+                content = backendPost.content,
+                timestamp = backendPost.created_at ?: "Just now"
+            )
+        }
+
+    when {
+        loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        error != null -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = error ?: "Unknown error",
+                    color = Color.White
+                )
+            }
+        }
+
+        myPosts.isEmpty() -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "You have not created any posts yet.",
+                    color = Color.White
+                )
+            }
+        }
+
+        else -> {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                items(myPosts, key = { it.id }) { post ->
+                    PostCardModern(post)
+                }
+            }
         }
     }
 }
@@ -109,4 +181,3 @@ fun PostCardModern(post: Post) {
         }
     }
 }
-
