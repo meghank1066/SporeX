@@ -443,6 +443,10 @@ async def predict_image(
     file: UploadFile = File(...),
     email: str | None = Form(default=None),
 ):
+    print("DEBUG content_type:", file.content_type)
+    print("DEBUG filename:", file.filename)
+    print("DEBUG email:", email)
+
     if model is None:
         raise HTTPException(status_code=500, detail="Model is not loaded on the server")
 
@@ -457,7 +461,8 @@ async def predict_image(
     if len(file_bytes) > 5 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Image too large. Max size is 5MB.")
 
-    ext = Path(file.filename).suffix.lower()
+    original_name = file.filename or "upload.jpg"
+    ext = Path(original_name).suffix.lower()
     if ext not in {".jpg", ".jpeg", ".png"}:
         ext = ".jpg"
 
@@ -467,7 +472,12 @@ async def predict_image(
     with saved_path.open("wb") as buffer:
         buffer.write(file_bytes)
 
-    validate_image_file(saved_path)
+    try:
+        validate_image_file(saved_path)
+    except Exception:
+        if saved_path.exists():
+            saved_path.unlink(missing_ok=True)
+        raise
 
     try:
         results = model.predict(source=str(saved_path), save=False, conf=0.25)
@@ -508,7 +518,7 @@ async def predict_image(
 
         scan_doc = {
             "user_email": email,
-            "original_filename": file.filename,
+            "original_filename": original_name,
             "stored_filename": saved_path.name,
             "annotated_filename": annotated_filename,
             "content_type": file.content_type,
@@ -532,9 +542,11 @@ async def predict_image(
             "message": "Prediction complete",
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
+        print("DEBUG predict error:", str(e))
         raise HTTPException(status_code=500, detail=f"Inference failed: {str(e)}")
-
 
 # Optional: get scan history for a user
 @app.get("/api/scans/{email}")

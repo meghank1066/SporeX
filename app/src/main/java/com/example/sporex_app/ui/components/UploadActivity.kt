@@ -1,26 +1,25 @@
 package com.example.sporex_app.ui.components
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.material3.*
-import androidx.activity.result.contract.ActivityResultContracts
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
-
 
 class UploadActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,16 +31,16 @@ class UploadActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                         Surface(color = MaterialTheme.colorScheme.surface) {
+                        Surface(color = MaterialTheme.colorScheme.surface) {
                             TopBar()
                         }
                     },
                     bottomBar = {
-                         Surface(color = MaterialTheme.colorScheme.surface) {
+                        Surface(color = MaterialTheme.colorScheme.surface) {
                             BottomNavBar(currentScreen = "camera")
                         }
                     },
-                     containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                 ) { paddingValues ->
                     UploadScreen(
                         modifier = Modifier
@@ -49,8 +48,12 @@ class UploadActivity : ComponentActivity() {
                             .padding(paddingValues),
                         onBack = { finish() },
                         onNext = { uri ->
-                            val intent = Intent(context, ConfirmationActivity::class.java)
-                            intent.putExtra("imageUri", uri.toString())
+                            val intent = Intent(context, ConfirmationActivity::class.java).apply {
+                                putExtra("imageUri", uri.toString())
+
+                                // Optional: pass email if you already store/login with it
+                                // putExtra("email", "user@example.com")
+                            }
                             startActivity(intent)
                         }
                     )
@@ -67,9 +70,12 @@ fun UploadScreen(
     onNext: (Uri) -> Unit
 ) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri -> selectedImageUri = uri }
+    ) { uri ->
+        selectedImageUri = uri
+    }
 
     Box(
         modifier = modifier
@@ -90,7 +96,6 @@ fun UploadScreen(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Back button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
@@ -118,7 +123,6 @@ fun UploadScreen(
 
                 Spacer(Modifier.height(24.dp))
 
-                // Upload Box Card
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
