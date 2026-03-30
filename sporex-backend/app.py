@@ -8,9 +8,14 @@ from pydantic import BaseModel, EmailStr
 from pymongo import MongoClient
 from passlib.context import CryptContext
 from datetime import datetime, timezone
-
+import random
+import requests
+import smtplib
+from email.mime.text import MIMEText
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
+
 
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
@@ -186,30 +191,37 @@ async def register(body: RegisterBody):
     password_hash = hash_password(body.password)
 
     # 4) Build document
+    otp = generate_otp()
     user_doc = {
         "email": body.email,
         "username": username,
         "password_hash": password_hash,
         "role": "member",
         "status": "active",
+        "is_verified": False,
+        "otp": otp,
+        "otp_expiry": datetime.now(timezone.utc) + timedelta(minutes=10),
         "created_at": datetime.now(timezone.utc),
 
         "settings": {
-        "dark_mode": False,
-        "notifications_enabled": True,
-        "data_personalisation": True,
-        "app_customisation": {
-            "accent_color": "green",
-            "layout_style": "default"
-        
-           }
+            "dark_mode": False,
+            "notifications_enabled": True,
+            "data_personalisation": True,
+            "app_customisation": {
+                "accent_color": "green",
+                "layout_style": "default"
+            }
+        }
     }
-}
+
+
+
 
     if body.name:
         user_doc["name"] = body.name
 
     users_col.insert_one(user_doc)
+    send_otp_email(body.email, otp)
     return {"success": True, "message": "User registered"}
 
 @app.post("/api/login")
@@ -228,6 +240,14 @@ async def login(body: LoginBody):
             content={"success": False, "message": "Invalid credentials"},
         )
 
+
+
+# keeping already existing users
+    if not user.get("is_verified", True):
+        return JSONResponse(
+            status_code=403,
+            content={"success": False, "message": "Please verify your email"}
+        )
     # (Optional) return basic user info for the app
     return {
         "success": True,
@@ -305,25 +325,54 @@ async def create_post(body: PostCreateBody):
 
 @app.get("/api/posts")
 async def list_posts():
-    """Get all posts"""
-    posts = list(posts_col.find({}, {"_id": 0}))
+    posts = []
+    for post in posts_col.find():
+        replies = []
+        for reply in post.get("replies", []):
+            replies.append({
+                "user_name": reply.get("user_name", ""),
+                "content": reply.get("content", ""),
+                "created_at": reply.get("created_at").isoformat() if reply.get("created_at") else None
+            })
+
+        posts.append({
+            "id": str(post["_id"]),
+            "user_name": post.get("user_name", ""),
+            "post_name": post.get("post_name", ""),
+            "content": post.get("content", ""),
+            "created_at": post.get("created_at").isoformat() if post.get("created_at") else None,
+            "replies": replies
+        })
     return posts
+
 
 @app.get("/api/posts/{post_id}")
 async def get_post(post_id: str):
-    """Get a specific post by ID"""
     from bson import ObjectId
     try:
-        post = posts_col.find_one(
-            {"_id": ObjectId(post_id)},
-            {"_id": 0}
-        )
+        post = posts_col.find_one({"_id": ObjectId(post_id)})
     except:
         raise HTTPException(status_code=400, detail="Invalid post ID")
-    
+
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    return post
+
+    replies = []
+    for reply in post.get("replies", []):
+        replies.append({
+            "user_name": reply.get("user_name", ""),
+            "content": reply.get("content", ""),
+            "created_at": reply.get("created_at").isoformat() if reply.get("created_at") else None
+        })
+
+    return {
+        "id": str(post["_id"]),
+        "user_name": post.get("user_name", ""),
+        "post_name": post.get("post_name", ""),
+        "content": post.get("content", ""),
+        "created_at": post.get("created_at").isoformat() if post.get("created_at") else None,
+        "replies": replies
+    }
 
 @app.post("/api/posts/{post_id}/replies", response_model=BasicResponse)
 async def add_reply(post_id: str, body: ReplyCreateBody):
@@ -353,6 +402,39 @@ async def add_reply(post_id: str, body: ReplyCreateBody):
         "message": "Reply added to post"
     }
 
+
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+
+
+
+
+def send_otp_email(to_email: str, otp: str):
+    api_key = os.getenv("RESEND_API_KEY")
+
+    print("DEBUG RESEND KEY:", "SET" if api_key else "NOT SET")
+
+    try:
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": "SporeX <onboarding@resend.dev>",
+                "to": [to_email],
+                "subject": "SporeX Email Verification",
+                "html": f"<p>Your verification code is: <strong>{otp}</strong></p>",
+            },
+        )
+
+        print("Email response:", response.text)
+
+    except Exception as e:
+        print("❌ Email error:", e)
 # ----------------------------
 # Settings ENDPOINTS
 # enabling darkmode, profile delete access, log out , navigate to device page

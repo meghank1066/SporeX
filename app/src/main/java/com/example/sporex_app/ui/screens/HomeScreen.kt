@@ -69,21 +69,9 @@ fun HomeScreen(
 
                     CameraCard(onUploadClick = onUploadClick)
 
-                    Button(
-                        onClick = onProductsClick,
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Text("Products & Methods")
-                    }
 
-                    Spacer(Modifier.height(12.dp))
+                    // Optional spacing so it doesn’t hug the bottom
+                  //  Spacer(Modifier.height(12.dp))
                 }
             }
         }

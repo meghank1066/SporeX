@@ -71,11 +71,13 @@ class ResultActivity : ComponentActivity() {
 
 @Composable
 fun MoldResultScreen() {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
+
     ) {
         // Mold Detected Alert
         Row(
@@ -118,6 +120,37 @@ fun MoldResultScreen() {
             onClick = { Toast.makeText(null, "Viewing Service Details", Toast.LENGTH_SHORT).show() }
         )
 
+
+        Button(
+            onClick = { Toast.makeText(null, "Ask Question clicked", Toast.LENGTH_SHORT).show() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black,
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text("Ask Question")
+        }
+
+        // ✅ Products button placed inside the layout (safe)
+        Button(
+            onClick = {
+                context.startActivity(Intent(context, ProductsActivity::class.java))
+            },
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF06A546),
+                contentColor = Color.Black
+            )
+        ) {
+            Text("View More Remedies")
+        }
 
     }
 }

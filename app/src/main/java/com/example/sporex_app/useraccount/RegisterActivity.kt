@@ -1,7 +1,8 @@
 package com.example.sporex_app.useraccount
-
+import com.example.sporex_app.useraccount.LoginActivity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -19,7 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.widget.Toast
+import com.example.sporex_app.network.RegisterRequest
+import com.example.sporex_app.network.RetrofitClient
+import com.example.sporex_app.network.SporexApi
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class RegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +42,8 @@ class RegisterActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen() {
-
+    val coroutineScope = rememberCoroutineScope()
+    val apiService = RetrofitClient.api
     val context = LocalContext.current
     val activity = context as? RegisterActivity
 
@@ -110,7 +118,48 @@ fun RegisterScreen() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { /* TODO: handle registration */ },
+                onClick = {
+                    Log.d("REGISTER", "Button clicked")
+                    coroutineScope.launch {
+                        try {
+                            val response = apiService.registerUser(
+                                RegisterRequest(
+                                    email = email,
+                                    password = password,
+                                    username = username
+                                )
+                            )
+
+                            if (response.isSuccessful) {
+                                Log.d("REGISTER", "Success: ${response.body()}")
+
+                                Toast.makeText(
+                                    context,
+                                    "Account created successfully!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                            } else {
+                                Log.e("REGISTER", "Error: ${response.code()}")
+
+                                Toast.makeText(
+                                    context,
+                                    "Registration failed (${response.code()})",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        } catch (e: Exception) {
+                            Log.e("REGISTER", "Exception: ${e.message}")
+
+                            Toast.makeText(
+                                context,
+                                "Something went wrong. Try again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                },
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()

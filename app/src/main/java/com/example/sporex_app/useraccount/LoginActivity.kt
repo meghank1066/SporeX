@@ -27,6 +27,7 @@ import com.example.sporex_app.MainActivity
 import com.example.sporex_app.network.LoginRequest
 import com.example.sporex_app.network.RetrofitClient
 import kotlinx.coroutines.launch
+import com.example.sporex_app.useraccount.UserSession
 
 class LoginActivity : ComponentActivity() {
 
@@ -50,22 +51,31 @@ class LoginActivity : ComponentActivity() {
                 val response = RetrofitClient.api.login(LoginRequest(email, password))
 
                 if (response.isSuccessful && response.body()?.success == true) {
-                    val msg = response.body()?.message ?: "Login successful"
-                    val prefs = getSharedPreferences("auth", MODE_PRIVATE)
 
+                    val loginBody = response.body()
+                    val msg = loginBody?.message ?: "Login successful"
+
+                    val prefs = getSharedPreferences("auth", MODE_PRIVATE)
                     prefs.edit()
-                        .putString("user_email", email)
+                        .putString("user_email", loginBody?.user?.email)
                         .apply()
 
+                    UserSession.saveUser(
+                        context = this@LoginActivity,
+                        username = loginBody?.user?.name,
+                        email = loginBody?.user?.email
+                    )
 
                     onResult(true, msg)
-
 
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 } else {
-                    val msg = response.body()?.message
-                        ?: "Login failed (${response.code()})"
+                    val msg = when (response.code()) {
+                        403 -> "Please verify your email. Check your inbox."
+                        401 -> "Invalid email or password"
+                        else -> response.body()?.message ?: "Login failed (${response.code()})"
+                    }
 
                     onResult(false, msg)
                 }

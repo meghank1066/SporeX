@@ -15,14 +15,14 @@ class UploadActivityTest {
 
     @Test
     fun initialState_showsSelectPhoto_andNoNextButton() {
-        composeRule.onNodeWithText("Select Photo").assertExists()
+        composeRule.onNodeWithText("Tap to upload a photo").assertExists()
         composeRule.onNodeWithText("Next").assertDoesNotExist()
-        composeRule.onNodeWithText("Back").assertExists()
+        composeRule.onNodeWithText("← Back").assertExists()
     }
 
     @Test
     fun clickingBack_finishesActivity() {
-        composeRule.onNodeWithText("Back").performClick()
+        composeRule.onNodeWithText("← Back").performClick()
         composeRule.waitForIdle()
         assertTrue(composeRule.activity.isFinishing)
     }

@@ -18,6 +18,6 @@ class DeviceActivityNavigationTest {
         composeRule.onNodeWithText("Manage Device").assertExists().performClick()
 
         // We should now be on Edit screen
-        composeRule.onNodeWithText("Edit Device").assertExists()
+        composeRule.onNodeWithText("Remove Device").assertExists()
     }
 }

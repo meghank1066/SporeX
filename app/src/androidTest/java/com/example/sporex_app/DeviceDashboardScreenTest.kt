@@ -17,19 +17,21 @@ class DeviceDashboardScreenTest {
     @Test
     fun basicReadings_card_togglesExpandedState() {
         composeRule.setContent {
-            SPOREX_AppTheme(dynamicColor = false) {
-                DeviceDashboardScreen(onManageDeviceClick = {})
+            SPOREX_AppTheme {
+                DeviceDashboardScreen(
+                    deviceName = "Test Device",
+                    onManageDeviceClick = {},
+                    onCreateDeviceClick = {}
+                )
             }
         }
 
-        // Expanded by default, so HUMIDITY should be visible (label gets uppercased)
+
         composeRule.onNodeWithText("HUMIDITY").assertExists()
 
-        // Click card header to collapse
         composeRule.onNodeWithText("Basic Readings").performClick()
         composeRule.onNodeWithText("HUMIDITY").assertDoesNotExist()
 
-        // Click again to expand
         composeRule.onNodeWithText("Basic Readings").performClick()
         composeRule.onNodeWithText("HUMIDITY").assertExists()
     }
@@ -39,8 +41,12 @@ class DeviceDashboardScreenTest {
         var clicks = 0
 
         composeRule.setContent {
-            SPOREX_AppTheme(dynamicColor = false) {
-                DeviceDashboardScreen(onManageDeviceClick = { clicks++ })
+            SPOREX_AppTheme {
+                DeviceDashboardScreen(
+                    deviceName = "Test Device",
+                    onManageDeviceClick = { clicks++ },
+                    onCreateDeviceClick = {}
+                )
             }
         }
 

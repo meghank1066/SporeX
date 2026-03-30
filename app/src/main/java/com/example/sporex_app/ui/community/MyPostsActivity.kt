@@ -16,11 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.sporex_app.network.PostResponse
+import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.navigation.BottomNavBar
-import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.utils.isDarkMode
 
@@ -116,4 +118,3 @@ fun PostCardModern(post: Post) {
         }
     }
 }
-

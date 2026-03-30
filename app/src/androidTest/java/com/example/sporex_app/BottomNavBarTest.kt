@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import com.example.sporex_app.ui.navigation.BottomNavBar
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import org.junit.Rule
 import org.junit.Test
 
@@ -15,13 +16,16 @@ class BottomNavBarTest {
     @Test
     fun bottomNav_hasAllTabs_andTheyAreClickable() {
         composeRule.setContent {
-            BottomNavBar(currentScreen = "home")
+            SPOREX_AppTheme {
+                BottomNavBar(currentScreen = "home")
+            }
         }
 
-        // contentDescription is set to item.route in BottomNavBar
-        composeRule.onNodeWithContentDescription("home").assertExists().assertHasClickAction()
-        composeRule.onNodeWithContentDescription("devices").assertExists().assertHasClickAction()
-        composeRule.onNodeWithContentDescription("camera").assertExists().assertHasClickAction()
-        composeRule.onNodeWithContentDescription("profile").assertExists().assertHasClickAction()
+        // contentDescription matches the strings in BottomNavBar.kt
+        composeRule.onNodeWithContentDescription("Home").assertExists().assertHasClickAction()
+        composeRule.onNodeWithContentDescription("Devices").assertExists().assertHasClickAction()
+        composeRule.onNodeWithContentDescription("Camera").assertExists().assertHasClickAction()
+        composeRule.onNodeWithContentDescription("Community").assertExists().assertHasClickAction()
+        composeRule.onNodeWithContentDescription("Profile").assertExists().assertHasClickAction()
     }
 }
