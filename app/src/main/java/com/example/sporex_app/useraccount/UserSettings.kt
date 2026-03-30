@@ -30,19 +30,24 @@ import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 class UserSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val savedDarkMode = isDarkMode(this)
+
         setContent {
-            var isDarkMode by remember { mutableStateOf(false) }
+            var isDarkMode by remember { mutableStateOf(savedDarkMode) }
 
             SPOREX_AppTheme(darkTheme = isDarkMode) {
                 UserSettingsScreen(
                     isDarkMode = isDarkMode,
-                    onDarkModeChange = { isDarkMode = it }
+                    onDarkModeChange = { enabled ->
+                        isDarkMode = enabled
+                        setDarkMode(this, enabled)
+                    }
                 )
             }
         }
     }
 }
-
 
 @Composable
 fun UserSettingsScreen(
@@ -101,9 +106,9 @@ fun UserSettingsScreen(
                     .padding(horizontal = 16.dp, vertical = 24.dp)
                     .fillMaxSize()
                     .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        color = MaterialTheme.colorScheme.background,
                         shape = MaterialTheme.shapes.medium
-            )
+                    )
                     .padding(vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
@@ -112,9 +117,8 @@ fun UserSettingsScreen(
                     text = "Appearance",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .padding(start = 16.dp, bottom = 8.dp)
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -149,6 +153,9 @@ fun UserSettingsScreen(
     if (showAppCustomisationDialog) {
         AlertDialog(
             onDismissRequest = { showAppCustomisationDialog = false },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
             confirmButton = {},
             title = { Text("App Customisation") },
             text = {
@@ -175,6 +182,9 @@ fun UserSettingsScreen(
     if (showDataDialog) {
         AlertDialog(
             onDismissRequest = { showDataDialog = false },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
             confirmButton = {},
             title = { Text("Data Personalisation") },
             text = {
@@ -199,6 +209,9 @@ fun UserSettingsScreen(
     if (showNotificationsDialog) {
         AlertDialog(
             onDismissRequest = { showNotificationsDialog = false },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
             confirmButton = {},
             title = { Text("Notifications") },
             text = {
@@ -238,7 +251,7 @@ fun SettingsOption(label: String, onClick: () -> Unit) {
         Icon(
             imageVector = Icons.Default.ArrowForward,
             contentDescription = "Go to $label",
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = MaterialTheme.colorScheme.onBackground
         )
     }
 }

@@ -425,65 +425,6 @@ fun PasswordStrengthBar(strength: Float, colors: androidx.compose.material3.Colo
 }
 
 
-    @Composable
-fun RoundedPasswordField(
-    value: String,
-    label: String,
-    onValueChange: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, color = Color.White) },
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        shape = RoundedCornerShape(18.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.White,
-            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-            cursorColor = Color.White,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedContainerColor = Color.Black.copy(alpha = 0.25f),
-            unfocusedContainerColor = Color.Black.copy(alpha = 0.18f)
-
-        )
-    )
-}
-
-@Composable
-fun PasswordStrengthBar(strength: Float) {
-
-    val animatedWidth by animateFloatAsState(
-        targetValue = strength,
-        label = "strengthAnim"
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(8.dp)
-            .clip(RoundedCornerShape(50.dp))
-            .background(Color.Black.copy(alpha = 0.25f))
-    ) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(animatedWidth)
-                .background(
-                    when {
-                        strength < 0.34f -> Color.Red
-                        strength < 0.67f -> Color.Yellow
-                        else -> Color(0xFF00E676)
-                    }
-                )
-                .clip(RoundedCornerShape(50.dp))
-        )
-    }
-}
-
 fun calculatePasswordStrength(password: String): Float {
     var score = 0
 
@@ -499,15 +440,16 @@ class EditPasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val darkMode = com.example.sporex_app.utils.isDarkMode(this)
+
         setContent {
-            SPOREX_AppTheme {
+            SPOREX_AppTheme(darkTheme = darkMode) {
                 EditPasswordScreen(
                     onBack = { finish() },
                     onSave = { newPassword ->
                         val resultIntent = Intent().apply {
                             putExtra("new_password", newPassword)
                         }
-
 
                         setResult(Activity.RESULT_OK, resultIntent)
                         finish()

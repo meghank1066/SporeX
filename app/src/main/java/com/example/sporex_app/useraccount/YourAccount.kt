@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,12 +20,12 @@ import androidx.compose.ui.unit.sp
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import androidx.compose.runtime.setValue
-// 🎨 Sporex Colors
-private val SporexGreen = Color(0xFF00C853)
-private val SporexCard = Color(0xFF00241C)
+
 
 @Composable
 fun YourAccountScreen() {
+    // 🎨 Sporex Colors
+    val colors = MaterialTheme.colorScheme
 
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -35,8 +34,9 @@ fun YourAccountScreen() {
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomNavBar(currentScreen = "settings") },
-        containerColor = SporexGreen
-    ) { padding ->
+        containerColor = colors.primary
+    )
+    { padding ->
 
         Column(
             modifier = Modifier
@@ -51,7 +51,7 @@ fun YourAccountScreen() {
                 text = "Your Account",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = colors.onPrimary
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -59,7 +59,7 @@ fun YourAccountScreen() {
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = SporexCard
+                    containerColor = colors.surface
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -128,7 +128,7 @@ fun YourAccountScreen() {
                         }
                     }
                 ) {
-                    Text("Delete", color = Color.Red)
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -146,6 +146,8 @@ private fun AccountOptionItem(
     title: String,
     onClick: () -> Unit
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,7 +158,7 @@ private fun AccountOptionItem(
 
         Text(
             text = title,
-            color = Color.White,
+            color = colors.onSurface,
             fontSize = 16.sp,
             modifier = Modifier.weight(1f)
         )
@@ -164,7 +166,7 @@ private fun AccountOptionItem(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = null,
-            tint = Color.White
+            tint = colors.onSurface
         )
     }
 }

@@ -22,6 +22,7 @@ import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
+import com.example.sporex_app.utils.isDarkMode
 
 class CreatePostActivity : ComponentActivity() {
 
@@ -30,7 +31,8 @@ class CreatePostActivity : ComponentActivity() {
 
         setContent {
 
-            SPOREX_AppTheme {
+            val darkMode = isDarkMode(this)
+            SPOREX_AppTheme(darkTheme = darkMode) {
 
                 Scaffold(
                     topBar = { TopBar() },
@@ -50,13 +52,13 @@ class CreatePostActivity : ComponentActivity() {
 fun CreatePostScreen(
     modifier: Modifier = Modifier
 ) {
-
+    val colors = MaterialTheme.colorScheme
     var postContent by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.sporex_green))
+            .background(colors.background)
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -65,7 +67,7 @@ fun CreatePostScreen(
             text = "Create Post",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = colorResource(id = R.color.sporex_black)
+            color = colors.onBackground
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -73,12 +75,10 @@ fun CreatePostScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = colorResource(id = R.color.sporex_white)
-            ),
+            colors = CardDefaults.cardColors(containerColor = colors.surface),
             border = BorderStroke(
                 2.dp,
-                colorResource(id = R.color.sporex_black)
+                colors.onBackground
             )
         ) {
 
@@ -89,7 +89,7 @@ fun CreatePostScreen(
                 Text(
                     text = "What's on your mind?",
                     fontWeight = FontWeight.SemiBold,
-                    color = colorResource(id = R.color.sporex_black)
+                    color = colors.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -97,19 +97,22 @@ fun CreatePostScreen(
                 OutlinedTextField(
                     value = postContent,
                     onValueChange = { postContent = it },
+                    textStyle = androidx.compose.ui.text.TextStyle(color = colors.onSurface),
                     placeholder = {
                         Text(
                             "Share your mold experience or ask for advice...",
-                            color = colorResource(id = R.color.sporex_text_muted)
+                            color = colors.onSurface.copy(alpha = 0.6f)
                         )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.sporex_black),
-                        unfocusedBorderColor = colorResource(id = R.color.sporex_black),
-                        cursorColor = colorResource(id = R.color.sporex_black)
+                        focusedTextColor = colors.onSurface,
+                        unfocusedTextColor = colors.onSurface,
+                        focusedBorderColor = colors.primary,
+                        unfocusedBorderColor = colors.onSurface.copy(alpha = 0.5f),
+                        cursorColor = colors.primary
                     )
                 )
 
@@ -120,11 +123,9 @@ fun CreatePostScreen(
                 Button(
                     onClick = {
                         val activity = context as? Activity ?: return@Button
-
                         val resultIntent = Intent().apply {
                             putExtra("post_content", postContent)
                         }
-
                         activity.setResult(Activity.RESULT_OK, resultIntent)
                         activity.finish()
                     },
@@ -134,8 +135,8 @@ fun CreatePostScreen(
                         .height(50.dp),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(id = R.color.sporex_black),
-                        contentColor = colorResource(id = R.color.sporex_white)
+                        containerColor = colors.primary,
+                        contentColor = colors.onPrimary
                     )
                 ) {
                     Text("Post")
@@ -144,3 +145,4 @@ fun CreatePostScreen(
         }
     }
 }
+

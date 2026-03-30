@@ -10,8 +10,11 @@ import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 class YourAccountActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val darkMode = com.example.sporex_app.utils.isDarkMode(this)
+
         setContent {
-            SPOREX_AppTheme {
+            SPOREX_AppTheme(darkTheme = darkMode) {
                 YourAccountScreen()
             }
         }

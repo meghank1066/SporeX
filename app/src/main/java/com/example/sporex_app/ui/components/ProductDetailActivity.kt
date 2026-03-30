@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.example.sporex_app.network.ProductDetail
 import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.utils.isDarkMode
 import kotlinx.coroutines.launch
 
 class ProductDetailActivity : ComponentActivity() {
@@ -22,7 +23,9 @@ class ProductDetailActivity : ComponentActivity() {
         val productId = intent.getStringExtra("product_id") ?: "vinegar"
 
         setContent {
-            SPOREX_AppTheme {
+            val darkMode = isDarkMode(this)
+
+            SPOREX_AppTheme(darkTheme = darkMode) {
                 ProductDetailScreen(productId = productId)
             }
         }

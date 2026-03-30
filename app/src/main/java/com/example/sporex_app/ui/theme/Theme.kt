@@ -19,10 +19,12 @@ private val LightColors = lightColorScheme(
     background = SporexWhite,
     onBackground = SporexBlack,
 
+    surfaceVariant = SporexGrey,
     surface = SporexWhite,
     onSurface = SporexBlack,
 
     secondary = SporexGreenSoft
+
 )
 
 private val DarkColors = darkColorScheme(

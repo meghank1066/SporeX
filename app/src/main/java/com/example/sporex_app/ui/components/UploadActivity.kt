@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.utils.isDarkMode
 
 
 class UploadActivity : ComponentActivity() {
@@ -27,8 +28,8 @@ class UploadActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            SPOREX_AppTheme {
-                val context = this@UploadActivity
+            val darkMode = isDarkMode(this@UploadActivity)
+            SPOREX_AppTheme(darkTheme = darkMode) {
 
                 Scaffold(
                     topBar = {
@@ -49,7 +50,7 @@ class UploadActivity : ComponentActivity() {
                             .padding(paddingValues),
                         onBack = { finish() },
                         onNext = { uri ->
-                            val intent = Intent(context, ConfirmationActivity::class.java)
+                            val intent = Intent(this@UploadActivity, ConfirmationActivity::class.java)
                             intent.putExtra("imageUri", uri.toString())
                             startActivity(intent)
                         }
