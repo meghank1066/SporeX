@@ -23,7 +23,10 @@ import androidx.compose.ui.unit.sp
 import com.example.sporex_app.network.PostResponse
 import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.navigation.BottomNavBar
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import com.example.sporex_app.ui.navigation.TopBar
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.useraccount.UserSession
 import com.example.sporex_app.utils.isDarkMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,26 +60,91 @@ class MyPostsActivity : ComponentActivity() {
 
 @Composable
 fun MyPostsScreen() {
-    val colors = MaterialTheme.colorScheme
-    val posts = remember {
-        mutableStateListOf(
-            Post(1, "You", "Just found some mold behind the couch 😱", "2h ago")
-        )
-    }
+    var posts by remember { mutableStateOf<List<PostResponse>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .background(colors.background)
-    ) {
-        items(posts) { post ->
-            PostCardModern(post)
+    val context = LocalContext.current
+    val currentUsername = UserSession.getUsername(context)
+
+    LaunchedEffect(Unit) {
+        try {
+            val res = RetrofitClient.api.getPosts()
+            if (res.isSuccessful) {
+                posts = res.body().orEmpty()
+            } else {
+                error = "Failed to load posts (${res.code()})"
+            }
+        } catch (e: Exception) {
+            error = "Network error: ${e.localizedMessage ?: "Unknown error"}"
+        } finally {
+            loading = false
         }
     }
-}
+    val myPosts = posts
+        .filter { it.user_name == currentUsername }
+        .map { backendPost ->
+            Post(
+                id = backendPost.id.hashCode(),
+                author = backendPost.user_name,
+                content = backendPost.content,
+                timestamp = backendPost.created_at ?: "Just now"
+            )
+        }
 
+    when {
+        loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        error != null -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = error ?: "Unknown error",
+                    color = Color.White
+                )
+            }
+        }
+
+        myPosts.isEmpty() -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "You have not created any posts yet.",
+                    color = Color.White
+                )
+            }
+        }
+
+        else -> {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                items(myPosts, key = { it.id }) { post ->
+                    PostCardModern(post)
+                }
+            }
+        }
+
+    }
+}
 @Composable
 fun PostCardModern(post: Post) {
     val colors = MaterialTheme.colorScheme
@@ -96,7 +164,12 @@ fun PostCardModern(post: Post) {
             )
             Spacer(Modifier.width(10.dp))
             Column {
-                Text(post.author, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = colors.onSurface)
+                Text(
+                    post.author,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = colors.onSurface
+                )
                 Text(post.timestamp, fontSize = 12.sp, color = colors.onSurfaceVariant)
             }
         }

@@ -25,6 +25,7 @@ import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
+import com.example.sporex_app.useraccount.UserSession
 import com.example.sporex_app.utils.isDarkMode
 
 class CreatePostActivity : ComponentActivity() {

@@ -2,10 +2,12 @@ package com.example.sporex_app.ui.community
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +37,7 @@ import kotlinx.coroutines.launch
 import com.example.sporex_app.useraccount.UserSession
 
 class CommunityHP : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: android.os.Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -181,6 +184,7 @@ class CommunityHP : ComponentActivity() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CommunityScreen(
     posts: List<PostResponse>,
@@ -211,16 +215,6 @@ fun CommunityScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        val filteredPosts = when (filter) {
-
-            "My Posts" -> postsState.value.filter {
-                it.author == "You"
-            }
-
-
-            else -> postsState.value
-        }
 
         LazyColumn {
             items(filteredPosts, key = { it.id }) { backendPost ->
@@ -396,6 +390,7 @@ fun FilterChip(
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun CommunityScreenPreview() {

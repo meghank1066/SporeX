@@ -44,3 +44,6 @@ __pycache__/
 
 .vscode/
 
+
+#Device config
+device/SporeX_Device/config.h
