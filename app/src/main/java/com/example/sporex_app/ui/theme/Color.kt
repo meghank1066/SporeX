@@ -10,6 +10,8 @@ val SporexGreen = Color(0xFF06A546)       // Light mode primary
 val SporexGreenDark = Color(0xFF027A32)   // Dark mode primary
 val SporexWhite = Color(0xFFFFFFFF)
 
+val SporexGray = Color(0xFFF5F5F5)
+
 // Dark mode surfaces
 val SporexSurface = Color(0xFF040F0F)
 val SporexCard = Color(0xFF0D1F0D)

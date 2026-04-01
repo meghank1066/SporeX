@@ -20,13 +20,21 @@ import com.example.sporex_app.network.ProductSummary
 import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import com.example.sporex_app.ui.navigation.BottomNavBar
+import com.example.sporex_app.ui.navigation.TopBar
+import com.example.sporex_app.utils.isDarkMode
 
 
 class ProductsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SPOREX_AppTheme {
+            val darkMode = isDarkMode(this)
+            SPOREX_AppTheme(darkTheme = darkMode) {
                 ProductsScreen(
                     onSelect = { productId ->
                         startActivity(

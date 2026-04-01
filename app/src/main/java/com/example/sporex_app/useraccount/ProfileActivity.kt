@@ -104,7 +104,7 @@ fun ProfileScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-//                .background(MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.primary)
                 .padding(
                     bottom = padding.calculateBottomPadding(),
                     start = padding.calculateStartPadding(LayoutDirection.Ltr),

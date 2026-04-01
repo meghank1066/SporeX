@@ -20,7 +20,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
-
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.utils.isDarkMode
 
 class ConfirmationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,40 +31,42 @@ class ConfirmationActivity : ComponentActivity() {
         val activity = this@ConfirmationActivity
 
         setContent {
-            Scaffold(
-                bottomBar = { BottomNavBar(currentScreen = "camera") },
-                containerColor = Color.White
-            ) { padding ->
+            val darkMode = isDarkMode(this)
+            SPOREX_AppTheme(darkTheme = darkMode) {
+                Scaffold(
+                    bottomBar = { BottomNavBar(currentScreen = "camera") },
+                    // Use theme color instead of Color.White
+//                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ) { padding ->
 
-                val bottomPadding = padding.calculateBottomPadding()
+                    val bottomPadding = padding.calculateBottomPadding()
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFF06A546))
-                        .padding(bottom = bottomPadding)
-                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            // Use primary color from theme
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(bottom = bottomPadding)
+                    ) {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            TopBar()
 
-                    Column(modifier = Modifier.fillMaxSize()) {
-
-                        // TopBar sits flush at the top now
-                        TopBar()
-
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            color = Color.White,
-                            shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)
-                        ) {
-
-                            ConfirmationScreen(
-                                imageUri = imageUri,
-                                onNext = {
-                                    activity.startActivity(
-                                        Intent(activity, ResultActivity::class.java)
-                                    )
-                                },
-                                onBack = { activity.finish() }
-                            )
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                // Use surface color from theme
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)
+                            ) {
+                                ConfirmationScreen(
+                                    imageUri = imageUri,
+                                    onNext = {
+                                        activity.startActivity(
+                                            Intent(activity, ResultActivity::class.java)
+                                        )
+                                    },
+                                    onBack = { activity.finish() }
+                                )
+                            }
                         }
                     }
                 }
@@ -86,13 +89,13 @@ fun ConfirmationScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Spacer(Modifier.height(12.dp))
 
         Text(
             text = "Review Your Photo",
             style = MaterialTheme.typography.headlineSmall,
-            color = Color.Black
+            // Use onSurface so it flips between black/white automatically
+            color = MaterialTheme.colorScheme.surface
         )
 
         Spacer(Modifier.height(20.dp))
@@ -114,7 +117,7 @@ fun ConfirmationScreen(
         Text(
             text = "Is this the correct photo for analysis?",
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.surface
         )
 
         Spacer(Modifier.height(32.dp))
@@ -123,7 +126,7 @@ fun ConfirmationScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
+            // Retake Button (Secondary style)
             Button(
                 onClick = onBack,
                 modifier = Modifier
@@ -131,15 +134,15 @@ fun ConfirmationScreen(
                     .height(52.dp),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.LightGray,
-                    contentColor = Color.Black
+                    // Use secondary or surface variant for a "lesser" action
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             ) {
                 Text("Retake")
             }
 
             Spacer(Modifier.width(16.dp))
-
             Button(
                 onClick = onNext,
                 modifier = Modifier
@@ -147,8 +150,8 @@ fun ConfirmationScreen(
                     .height(52.dp),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground
                 )
             ) {
                 Text("Confirm")

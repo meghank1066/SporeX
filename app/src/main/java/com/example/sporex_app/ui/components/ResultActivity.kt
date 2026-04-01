@@ -18,48 +18,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
-import androidx.compose.ui.platform.LocalContext
-import com.example.sporex_app.ui.components.ProductsActivity
-import com.example.sporex_app.ui.components.UploadActivity
-import android.content.Intent
-import androidx.compose.ui.platform.LocalContext
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.utils.isDarkMode
 
 class ResultActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Scaffold(
-                bottomBar = { BottomNavBar(currentScreen = "camera") },
-                containerColor = Color.White
-            ) { padding ->
+            val darkMode = isDarkMode(this)
+            SPOREX_AppTheme(darkTheme = darkMode) {
+                Scaffold(
+                    bottomBar = { BottomNavBar(currentScreen = "camera") },
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ) { padding ->
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFF06A546))
-                        .padding(bottom = padding.calculateBottomPadding())
-                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(bottom = padding.calculateBottomPadding())
+                    ) {
 
-                    Column(modifier = Modifier.fillMaxSize()) {
+                        Column(modifier = Modifier.fillMaxSize()) {
 
-                        TopBar()
+                            TopBar()
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 20.dp, vertical = 24.dp),
-                            contentAlignment = Alignment.TopCenter
-                        ) {
-                            Surface(
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight(),
-                                color = Color.White,
-                                shape = RoundedCornerShape(24.dp),
-                                tonalElevation = 4.dp
+                                    .fillMaxSize()
+                                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                                contentAlignment = Alignment.TopCenter
                             ) {
-                                MoldResultScreen()
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(),
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shape = RoundedCornerShape(24.dp),
+                                    tonalElevation = 4.dp
+                                ) {
+                                    MoldResultScreen()
+                                }
                             }
                         }
                     }
@@ -84,23 +84,29 @@ fun MoldResultScreen() {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFFFE0B2), RoundedCornerShape(12.dp))
+                .background(
+                    color = MaterialTheme.colorScheme.errorContainer, RoundedCornerShape(12.dp))
                 .padding(16.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = "Warning",
-                tint = Color(0xFFD32F2F)
+                tint = MaterialTheme.colorScheme.error
             )
             Spacer(Modifier.width(12.dp))
             Column {
-                Text("Mold Detected", style = MaterialTheme.typography.titleMedium)
-                Text("Cladosporium – estimated 65% likelihood", style = MaterialTheme.typography.bodySmall)
+                Text("Mold Detected",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer)
+                Text("Cladosporium – estimated 65% likelihood",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f))
             }
         }
 
         // Suggested Remedies
-        Text("Suggested Remedies", style = MaterialTheme.typography.titleLarge)
+        Text("Suggested Remedies", style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface)
 
         RemedyCard(
             title = "Mold Remover Spray",
@@ -153,19 +159,24 @@ fun MoldResultScreen() {
 fun RemedyCard(title: String, description: String, onClick: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        tonalElevation = 2.dp,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(title, style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface)
             Spacer(Modifier.height(6.dp))
-            Text(description, style = MaterialTheme.typography.bodySmall)
+            Text(
+                description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.height(12.dp))
             Button(
                 onClick = onClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF06A546),
-                    contentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {

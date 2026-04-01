@@ -8,11 +8,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +24,7 @@ import com.example.sporex_app.R
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.utils.isDarkMode
 
 class AsthmaSociety : ComponentActivity() {
 
@@ -34,7 +33,8 @@ class AsthmaSociety : ComponentActivity() {
 
         setContent {
 
-            SPOREX_AppTheme {
+            val darkMode = isDarkMode(this)
+            SPOREX_AppTheme(darkTheme = darkMode) {
 
                 Scaffold(
                     topBar = { TopBar() },
@@ -56,11 +56,12 @@ fun AsthmaSocietyFeed(
 ) {
 
     val context = LocalContext.current
+    val colors = MaterialTheme.colorScheme
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.sporex_green))
+            .background(colors.primary)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -70,10 +71,10 @@ fun AsthmaSocietyFeed(
             shape = RoundedCornerShape(24.dp),
             border = BorderStroke(
                 2.dp,
-                colorResource(id = R.color.sporex_black)
+                colors.onSurface
             ),
             colors = CardDefaults.cardColors(
-                containerColor = colorResource(id = R.color.sporex_white)
+                containerColor = colors.surface
             ),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -94,14 +95,14 @@ fun AsthmaSocietyFeed(
                 Text(
                     text = "Asthma Society Collaborator Service",
                     fontWeight = FontWeight.SemiBold,
-                    color = colorResource(id = R.color.sporex_black)
+                    color = colors.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = "Connect with our medical collaborators via WhatsApp for consultation and support.",
-                    color = colorResource(id = R.color.sporex_text_muted),
+                    color = colors.onSurfaceVariant,
                     fontSize = 14.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
@@ -120,8 +121,8 @@ fun AsthmaSocietyFeed(
                     },
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(id = R.color.sporex_black),
-                        contentColor = colorResource(id = R.color.sporex_white)
+                        containerColor = colors.onSurface,
+                        contentColor = colors.surface,
                     ),
                     modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {

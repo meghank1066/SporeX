@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +29,8 @@ import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
+import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.utils.isDarkMode
 import kotlinx.coroutines.launch
 import com.example.sporex_app.useraccount.UserSession
 
@@ -38,7 +39,10 @@ class CommunityHP : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            SPOREX_AppTheme {
+
+            val darkMode = isDarkMode(this)
+            SPOREX_AppTheme(darkTheme = darkMode) {
+
                 val context = LocalContext.current
                 val scope = rememberCoroutineScope()
 
@@ -186,6 +190,7 @@ fun CommunityScreen(
 ) {
     var selectedPost by remember { mutableStateOf<PostResponse?>(null) }
     var filter by remember { mutableStateOf("Popular") }
+    val colors = MaterialTheme.colorScheme
 
     val uiPosts = posts.map { it.toCommunityPost() }
 
@@ -197,7 +202,7 @@ fun CommunityScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.sporex_green))
+            .background(colors.background)
             .padding(16.dp)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -206,6 +211,16 @@ fun CommunityScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        val filteredPosts = when (filter) {
+
+            "My Posts" -> postsState.value.filter {
+                it.author == "You"
+            }
+
+
+            else -> postsState.value
+        }
 
         LazyColumn {
             items(filteredPosts, key = { it.id }) { backendPost ->
@@ -256,16 +271,12 @@ fun CommunityPostCard(
     onDelete: () -> Unit,
     onViewFull: () -> Unit
 ) {
+    val colors = MaterialTheme.colorScheme
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.sporex_white)
-        ),
-        border = BorderStroke(
-            2.dp,
-            colorResource(id = R.color.sporex_black)
-        )
+        colors = CardDefaults.cardColors(containerColor = colors.surface),
+        border = BorderStroke(1.dp, colors.onSurface)
     ) {
         Column(
             modifier = Modifier.padding(18.dp)
@@ -274,29 +285,19 @@ fun CommunityPostCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    post.author,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.sporex_black)
-                )
-
-                Text(
-                    post.timestamp,
-                    fontSize = 12.sp,
-                    color = colorResource(id = R.color.sporex_text_muted)
-                )
+                Text(post.author, fontWeight = FontWeight.Bold, color = colors.onSurface)
+                Text(post.timestamp, fontSize = 12.sp, color = colors.onSurfaceVariant)
             }
+
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Text(
-                post.content,
-                color = colorResource(id = R.color.sporex_black),
-                fontSize = 15.sp
-            )
+            Text(post.content, color = colors.onSurface, fontSize = 15.sp)
 
             Spacer(modifier = Modifier.height(16.dp))
 
+
+            // Interaction Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -305,25 +306,21 @@ fun CommunityPostCard(
                     TextButton(onClick = onLike) {
                         Text(
                             if (post.isLiked) "♥ ${post.likes}" else "♡ ${post.likes}",
-                            color = colorResource(id = R.color.sporex_black)
+                            color = colors.primary
                         )
                     }
 
                     TextButton(onClick = onViewFull) {
                         Text(
                             "Comments (${post.comments.size})",
-                            color = colorResource(id = R.color.sporex_black)
+                            color = colors.primary
                         )
                     }
-                }
 
-                if (showDelete) {
-                    TextButton(onClick = onDelete) {
-                        Text(
-                            "Delete",
-                            color = colorResource(id = R.color.sporex_red)
-                        )
-                    }
+
+                TextButton(onClick = onDelete) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
                 }
             }
         }
@@ -380,52 +377,23 @@ fun FilterChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-
+    val colors = MaterialTheme.colorScheme
     Surface(
         shape = RoundedCornerShape(50),
-        color = if (selected)
-            colorResource(id = R.color.sporex_black)
-        else
-            colorResource(id = R.color.sporex_white),
-        border = BorderStroke(1.dp, colorResource(id = R.color.sporex_black)),
+        color = if (selected) colors.primary else colors.surface,
+        border = BorderStroke(1.dp, colors.onSurface),
         modifier = Modifier.clickable { onClick() }
     ) {
 
         Text(
             text = label,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            color = if (selected)
-                colorResource(id = R.color.sporex_white)
-            else
-                colorResource(id = R.color.sporex_black)
+            color = if (selected) colors.onPrimary else colors.onSurface
         )
     }
 }
 
 
-
-@Composable
-fun CommunityPostItem(post: CommunityPost) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFDDEFEF), RoundedCornerShape(12.dp))
-            .padding(12.dp)
-    ) {
-        Text(
-            text = post.author,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-            color = Color(0xFF0D3B66)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = post.content,
-            fontSize = 14.sp,
-            color = Color(0xFF1F4E5F)
-        )
-    }
-}
 
 
 @Preview(showBackground = true)

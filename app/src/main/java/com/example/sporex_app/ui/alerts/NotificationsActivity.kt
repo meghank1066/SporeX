@@ -1,6 +1,5 @@
 package com.example.sporex_app.ui.alerts
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
@@ -17,16 +16,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
-import androidx.compose.ui.res.colorResource
-import com.example.sporex_app.R
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import com.example.sporex_app.utils.isDarkMode
 
 
 class NotificationsActivity : ComponentActivity() {
@@ -60,7 +57,7 @@ class NotificationsActivity : ComponentActivity() {
         sendTestNotification(this)
 
         setContent {
-            SPOREX_AppTheme {
+            SPOREX_AppTheme(darkTheme = isDarkMode(this)) {
                 NotificationsScreen(notificationsList)
             }
         }
@@ -104,8 +101,10 @@ fun NotificationsScreen(notifications: List<NotificationItem>) {
             contentPadding = paddingValues,
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
+
         ) {
 
             items(notifications) { notification ->
@@ -118,22 +117,22 @@ fun NotificationsScreen(notifications: List<NotificationItem>) {
 
 @Composable
 fun NotificationCard(notification: NotificationItem) {
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                MaterialTheme.colorScheme.surface,
-                RoundedCornerShape(12.dp)
+                // Changed from surface to primary
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(12.dp)
             )
             .padding(16.dp)
     ) {
-
         Text(
             text = notification.title,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            // Changed to onPrimary so it's readable on the green background
+            color = MaterialTheme.colorScheme.onPrimary
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -141,7 +140,8 @@ fun NotificationCard(notification: NotificationItem) {
         Text(
             text = notification.message,
             fontSize = 14.sp,
-            color = Color(0xFF555555)
+            // Changed to onPrimary (or a slightly transparent version of it)
+            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -149,7 +149,8 @@ fun NotificationCard(notification: NotificationItem) {
         Text(
             text = notification.time,
             fontSize = 12.sp,
-            color = Color(0xFF999999),
+            // Adjusted for visibility on green
+            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
             modifier = Modifier.align(Alignment.End)
         )
     }
