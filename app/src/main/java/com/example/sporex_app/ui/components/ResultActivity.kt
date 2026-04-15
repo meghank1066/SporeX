@@ -110,7 +110,7 @@ class ResultActivity : ComponentActivity() {
         val fullImageUrl = if (imageUrl.startsWith("http")) {
             imageUrl
         } else {
-            "http://10.0.2.2:8000$imageUrl"
+            "https://sporex.onrender.com/$imageUrl"
         }
 
         val confidencePercent = (maxConfidence * 100).toInt()

@@ -524,7 +524,6 @@ async def predict_image(
             status_code=400, detail="Only JPG and PNG images are allowed"
         )
 
-    # Optional simple size limit: 5MB
     file_bytes = await file.read()
     if len(file_bytes) > 5 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Image too large. Max size is 5MB.")
@@ -549,7 +548,6 @@ async def predict_image(
 
     try:
         results = model.predict(source=str(saved_path), save=False, conf=0.25)
-
         result = results[0]
 
         detections = []
@@ -576,38 +574,46 @@ async def predict_image(
 
         mould_detected = len(detections) > 0
 
-        # Save annotated image
-        plotted = result.plot()  # numpy array in BGR
+        plotted = result.plot()
         annotated_filename = f"{file_id}.jpg"
         annotated_path = ANNOTATED_DIR / annotated_filename
         Image.fromarray(plotted[:, :, ::-1]).save(annotated_path)
 
         image_url = f"/static/{annotated_filename}"
+        message = "Prediction complete"
 
-        scan_doc = {
-            "user_email": email,
-            "original_filename": original_name,
-            "stored_filename": saved_path.name,
-            "annotated_filename": annotated_filename,
-            "content_type": file.content_type,
-            "mould_detected": mould_detected,
-            "max_confidence": round(max_confidence, 4)
-            if max_confidence is not None
-            else None,
-            "detections": detections,
-            "created_at": datetime.now(timezone.utc),
-        }
-        scans_col.insert_one(scan_doc)
+        # Check whether this user's settings allow storing scan history
+        can_store_scan = False
+        if email:
+            user = users_col.find_one({"email": email})
+            if user:
+                can_store_scan = bool(
+                    user.get("settings", {}).get("data_personalisation", False)
+                )
+
+        if can_store_scan:
+            scan_doc = {
+                "user_email": email,
+                "original_filename": original_name,
+                "stored_filename": saved_path.name,
+                "annotated_filename": annotated_filename,
+                "content_type": file.content_type,
+                "mould_detected": mould_detected,
+                "max_confidence": round(max_confidence, 4) if max_confidence is not None else None,
+                "detections": detections,
+                "image_url": image_url,
+                "message": message,
+                "created_at": datetime.now(timezone.utc),
+            }
+            scans_col.insert_one(scan_doc)
 
         return {
             "success": True,
             "mould_detected": mould_detected,
-            "max_confidence": round(max_confidence, 4)
-            if max_confidence is not None
-            else None,
+            "max_confidence": round(max_confidence, 4) if max_confidence is not None else None,
             "detections": detections,
             "image_url": image_url,
-            "message": "Prediction complete",
+            "message": message,
         }
 
     except HTTPException:
@@ -657,7 +663,56 @@ def send_otp_email(to_email: str, otp: str):
 # Optional: get scan history for a user
 @app.get("/api/scans/{email}")
 async def get_user_scans(email: str):
-    scans = list(
-        scans_col.find({"user_email": email}, {"_id": 0}).sort("created_at", -1)
-    )
+    scans = []
+
+    for scan in scans_col.find({"user_email": email}).sort("created_at", -1):
+        created_at = scan.get("created_at")
+        annotated_filename = scan.get("annotated_filename")
+        image_url = scan.get("image_url")
+
+        if not image_url and annotated_filename:
+            image_url = f"/static/{annotated_filename}"
+
+        scans.append({
+            "id": str(scan.get("_id")),
+            "user_email": scan.get("user_email"),
+            "original_filename": scan.get("original_filename"),
+            "stored_filename": scan.get("stored_filename"),
+            "annotated_filename": annotated_filename,
+            "content_type": scan.get("content_type"),
+            "mould_detected": scan.get("mould_detected", False),
+            "max_confidence": scan.get("max_confidence"),
+            "detections": scan.get("detections", []),
+            "image_url": image_url,
+            "message": scan.get("message", "Prediction complete"),
+            "created_at": created_at.isoformat() if created_at else None,
+        })
+
     return scans
+
+@app.delete("/api/scans/{scan_id}", response_model=BasicResponse)
+async def delete_scan(scan_id: str):
+    from bson import ObjectId
+
+    try:
+        scan_obj_id = ObjectId(scan_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid scan ID")
+
+    scan = scans_col.find_one({"_id": scan_obj_id})
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+
+    # Delete related files if they exist
+    stored_filename = scan.get("stored_filename")
+    annotated_filename = scan.get("annotated_filename")
+
+    if stored_filename:
+        (UPLOAD_DIR / stored_filename).unlink(missing_ok=True)
+
+    if annotated_filename:
+        (ANNOTATED_DIR / annotated_filename).unlink(missing_ok=True)
+
+    scans_col.delete_one({"_id": scan_obj_id})
+
+    return {"success": True, "message": "Scan deleted"}
