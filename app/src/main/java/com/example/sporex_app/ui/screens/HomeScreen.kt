@@ -3,6 +3,7 @@ package com.example.sporex_app.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,60 +20,51 @@ import com.example.sporex_app.ui.navigation.TopBar
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier,
     onUploadClick: () -> Unit,
     onProductsClick: () -> Unit,
     onHistoryClick: () -> Unit
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary)
+            .navigationBarsPadding() // ✅ Fixes phone nav overlap
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
 
-            TopBar()
-            Spacer(modifier = Modifier.height(32.dp))
+        TopBar()
 
-            Surface(
-                modifier = Modifier.weight(1f),
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Surface(
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp, bottom = 12.dp)
-                ) {
 
-                    Text(
-                        text = "Welcome Back!",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(start = 20.dp)
-                    )
+                Text(
+                    text = "Welcome Back!",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineLarge
+                )
 
-                    Spacer(Modifier.height(20.dp))
+                PreviousCaseCard(onClick = onHistoryClick)
 
-                    PreviousCaseCard(onClick = onHistoryClick)
+                Text(
+                    text = "Scan For Mould",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineLarge
+                )
 
-                    Spacer(Modifier.height(20.dp))
-
-                    Text(
-                        text = "Scan For Mould",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(start = 20.dp)
-                    )
-
-                    CameraCard(onUploadClick = onUploadClick)
-
-
-                    // Optional spacing so it doesn’t hug the bottom
-                  //  Spacer(Modifier.height(12.dp))
-                }
+                CameraCard(onUploadClick = onUploadClick)
             }
         }
     }
@@ -80,44 +72,34 @@ fun HomeScreen(
 
 @Composable
 private fun CameraCard(onUploadClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .clickable { onUploadClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Spacer(Modifier.height(20.dp))
-
-        Card(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth()
-                .height(180.dp)
-                .clickable { onUploadClick() },
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.CameraAlt,
-                    contentDescription = "Camera",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(120.dp)
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.CameraAlt,
+                contentDescription = "Camera",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(100.dp)
+            )
         }
-
-        Spacer(Modifier.height(20.dp))
     }
 }
+
 @Composable
 private fun PreviousCaseCard(onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
