@@ -29,7 +29,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary)
-            .navigationBarsPadding() // ✅ Fixes phone nav overlap
+            .navigationBarsPadding() // Fixes phone nav overlap
     ) {
 
         TopBar()

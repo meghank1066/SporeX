@@ -31,6 +31,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.graphics.Color
 import com.example.sporex_app.network.ScanHistoryDto
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 
 class HistoryActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -95,6 +97,7 @@ fun HistoryScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {

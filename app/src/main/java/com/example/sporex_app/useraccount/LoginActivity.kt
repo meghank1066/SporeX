@@ -183,26 +183,9 @@ fun LoginScreen() {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                "Or continue with",
-                fontSize = 14.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
 
-            Button(
-                onClick = { /* TODO: Handle Google login */ },
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text("Google Login", fontSize = 16.sp)
-            }
+
+
 
             Spacer(modifier = Modifier.height(24.dp))
 
