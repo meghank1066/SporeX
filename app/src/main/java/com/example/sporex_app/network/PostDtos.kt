@@ -37,3 +37,9 @@ data class ReadingResponse(
     val humidity: Double,
     val created_at: String
 )
+
+
+data class ScanResponse(
+    val mould_detected: Boolean,
+    val max_confidence: Double?
+)

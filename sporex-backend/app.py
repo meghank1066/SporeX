@@ -630,36 +630,6 @@ def generate_otp():
 
 
 
-
-def send_otp_email(to_email: str, otp: str):
-    api_key = os.getenv("RESEND_API_KEY")
-
-    print("DEBUG RESEND KEY:", "SET" if api_key else "NOT SET")
-
-    try:
-        response = requests.post(
-            "https://api.resend.com/emails",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "from": "SporeX <onboarding@resend.dev>",
-                "to": [to_email],
-                "subject": "SporeX Email Verification",
-                "html": f"<p>Your verification code is: <strong>{otp}</strong></p>",
-            },
-        )
-
-        print("Email response:", response.text)
-
-    except Exception as e:
-        print("❌ Email error:", e)
-# ----------------------------
-# Settings ENDPOINTS
-# enabling darkmode, profile delete access, log out , navigate to device page
-# ----------------------------
-
 #---- device logs from mongo to frontend --
 @app.get("/api/readings/latest")
 def get_latest_reading():
@@ -673,6 +643,8 @@ def get_latest_reading():
     return reading
 
 # Optional: get scan history for a user
+
+
 @app.get("/api/scans/{email}")
 async def get_user_scans(email: str):
     scans = []
@@ -701,6 +673,24 @@ async def get_user_scans(email: str):
         })
 
     return scans
+# Home page Previous Updates
+@app.get("/api/scans/latest")
+  async def get_latest_scan():
+      scan = scans_col.find_one(
+          sort=[("created_at", -1)]
+      )
+
+      if not scan:
+          return {"message": "No scans found"}
+
+      return {
+          "id": str(scan["_id"]),
+          "mould_detected": scan.get("mould_detected", False),
+          "max_confidence": scan.get("max_confidence"),
+          "image_url": scan.get("image_url"),
+          "created_at": scan.get("created_at").isoformat() if scan.get("created_at") else None,
+      }
+
 
 @app.delete("/api/scans/{scan_id}", response_model=BasicResponse)
 async def delete_scan(scan_id: str):

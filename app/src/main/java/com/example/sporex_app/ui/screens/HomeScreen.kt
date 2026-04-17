@@ -11,12 +11,19 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.sporex_app.network.ScanResponse
 import com.example.sporex_app.ui.navigation.TopBar
+import com.example.sporex_app.network.RetrofitClient
 
 @Composable
 fun HomeScreen(
@@ -25,6 +32,15 @@ fun HomeScreen(
     onProductsClick: () -> Unit,
     onHistoryClick: () -> Unit
 ) {
+    var scan by remember { mutableStateOf<ScanResponse?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            scan = RetrofitClient.api.getLatestScan()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -55,7 +71,8 @@ fun HomeScreen(
                     style = MaterialTheme.typography.headlineLarge
                 )
 
-                PreviousCaseCard(onClick = onHistoryClick)
+                PreviousCaseCard(scan = scan,
+                    onClick = onHistoryClick)
 
                 Text(
                     text = "Scan For Mould",
@@ -69,6 +86,8 @@ fun HomeScreen(
         }
     }
 }
+
+
 
 @Composable
 private fun CameraCard(onUploadClick: () -> Unit) {
@@ -97,7 +116,8 @@ private fun CameraCard(onUploadClick: () -> Unit) {
 }
 
 @Composable
-private fun PreviousCaseCard(onClick: () -> Unit) {
+private fun PreviousCaseCard(scan: ScanResponse?,
+                             onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,16 +142,31 @@ private fun PreviousCaseCard(onClick: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    text = "65%",
+                    text = scan?.max_confidence?.let {
+                        "${(it * 100).toInt()}%"
+                    } ?: "--%",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Text(
-                    text = "SPOREX has detected 65% exposure of Trichoderma in your home.",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = scan?.max_confidence?.let {
+                        "${(it * 100).toInt()}%"
+                    } ?: "--%",
+                    fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = scan?.let {
+                        if (it.mould_detected) {
+                            "SPOREX detected ${(it.max_confidence!! * 100).toInt()}% likelihood of mould."
+                        } else {
+                            "No mould detected in the last scan."
+                        }
+                    } ?: "No previous scan available",
                 )
 
                 Spacer(Modifier.height(4.dp))

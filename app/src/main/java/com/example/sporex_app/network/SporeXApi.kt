@@ -88,4 +88,7 @@ interface SporexApi {
 
     @GET("api/readings/latest")
     suspend fun getLatestReading(): ReadingResponse
+
+    @GET("api/scans/latest")
+    suspend fun getLatestScan(): ScanResponse
 }
