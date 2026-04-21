@@ -2,6 +2,7 @@ package com.example.sporex_app.useraccount
 
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -15,17 +16,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sporex_app.R
 import com.example.sporex_app.network.RetrofitClient
+import com.example.sporex_app.settings.Settings
+import com.example.sporex_app.settings.UpdateSettingsRequest
 import com.example.sporex_app.utils.setDarkMode
 import com.example.sporex_app.utils.isDarkMode
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
+import kotlinx.coroutines.launch
 
 class UserSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,13 +36,13 @@ class UserSettings : ComponentActivity() {
         val savedDarkMode = isDarkMode(this)
 
         setContent {
-            var isDarkMode by remember { mutableStateOf(savedDarkMode) }
+            var isDarkModeState by remember { mutableStateOf(savedDarkMode) }
 
-            SPOREX_AppTheme(darkTheme = isDarkMode) {
+            SPOREX_AppTheme(darkTheme = isDarkModeState) {
                 UserSettingsScreen(
-                    isDarkMode = isDarkMode,
+                    isDarkMode = isDarkModeState,
                     onDarkModeChange = { enabled ->
-                        isDarkMode = enabled
+                        isDarkModeState = enabled
                         setDarkMode(this, enabled)
                     }
                 )
@@ -54,13 +56,12 @@ fun UserSettingsScreen(
     isDarkMode: Boolean,
     onDarkModeChange: (Boolean) -> Unit
 ) {
-
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var isNotificationsEnabled by remember { mutableStateOf(false) }
     var isDataPersonalisationEnabled by remember { mutableStateOf(false) }
 
-    // Modal states
     var showAppCustomisationDialog by remember { mutableStateOf(false) }
     var showNotificationsDialog by remember { mutableStateOf(false) }
     var showDataDialog by remember { mutableStateOf(false) }
@@ -68,6 +69,36 @@ fun UserSettingsScreen(
     val userEmail = remember {
         context.getSharedPreferences("auth", Context.MODE_PRIVATE)
             .getString("user_email", "") ?: ""
+    }
+
+    fun saveSettings(
+        darkMode: Boolean = isDarkMode,
+        notifications: Boolean = isNotificationsEnabled,
+        dataPersonalisation: Boolean = isDataPersonalisationEnabled
+    ) {
+        if (userEmail.isEmpty()) return
+
+        scope.launch {
+            try {
+                RetrofitClient.api.updateSettings(
+                    UpdateSettingsRequest(
+                        email = userEmail,
+                        settings = Settings(
+                            dark_mode = darkMode,
+                            notifications_enabled = notifications,
+                            data_personalisation = dataPersonalisation,
+                            app_customisation = emptyMap()
+                        )
+                    )
+                )
+            } catch (e: Exception) {
+                Toast.makeText(
+                    context,
+                    "Failed to save settings",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     LaunchedEffect(userEmail) {
@@ -92,7 +123,6 @@ fun UserSettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-
     ) {
         Scaffold(
             topBar = { TopBar() },
@@ -149,7 +179,6 @@ fun UserSettingsScreen(
         }
     }
 
-    // ---------- APP CUSTOMISATION MODAL ----------
     if (showAppCustomisationDialog) {
         AlertDialog(
             onDismissRequest = { showAppCustomisationDialog = false },
@@ -172,6 +201,7 @@ fun UserSettingsScreen(
                         onCheckedChange = { enabled ->
                             onDarkModeChange(enabled)
                             setDarkMode(context, enabled)
+                            saveSettings(darkMode = enabled)
                         }
                     )
                 }
@@ -188,24 +218,35 @@ fun UserSettingsScreen(
             confirmButton = {},
             title = { Text("Data Personalisation") },
             text = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Column {
                     Text(
-                        text = "Enable Data Personalisation",
-                        modifier = Modifier.weight(1f)
+                        text = "Allow SporeX to store your scanned mould images in your history.",
+                        style = MaterialTheme.typography.bodyMedium
                     )
-                    Switch(
-                        checked = isDataPersonalisationEnabled,
-                        onCheckedChange = { isDataPersonalisationEnabled = it }
-                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Store scanned images",
+                            modifier = Modifier.weight(1f)
+                        )
+                        Switch(
+                            checked = isDataPersonalisationEnabled,
+                            onCheckedChange = {
+                                isDataPersonalisationEnabled = it
+                                saveSettings(dataPersonalisation = it)
+                            }
+                        )
+                    }
                 }
             }
         )
     }
 
-    // ---------- NOTIFICATIONS MODAL ----------
     if (showNotificationsDialog) {
         AlertDialog(
             onDismissRequest = { showNotificationsDialog = false },
@@ -225,7 +266,10 @@ fun UserSettingsScreen(
                     )
                     Switch(
                         checked = isNotificationsEnabled,
-                        onCheckedChange = { isNotificationsEnabled = it }
+                        onCheckedChange = {
+                            isNotificationsEnabled = it
+                            saveSettings(notifications = it)
+                        }
                     )
                 }
             }

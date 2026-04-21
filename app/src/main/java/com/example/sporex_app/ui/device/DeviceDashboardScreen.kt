@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.example.sporex_app.network.ReadingResponse
+import com.example.sporex_app.network.RetrofitClient
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.navigation.TopBar
 
@@ -25,6 +27,15 @@ fun DeviceDashboardScreen(
 ) {
     var expanded by remember { mutableStateOf(true) }
 
+    var reading by remember { mutableStateOf<ReadingResponse?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            reading = RetrofitClient.api.getLatestReading()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     Scaffold(
         bottomBar = { BottomNavBar(currentScreen = "device") },
         containerColor = MaterialTheme.colorScheme.primary,
@@ -106,13 +117,28 @@ fun DeviceDashboardScreen(
 
                             if (expanded) {
                                 Spacer(Modifier.height(12.dp))
-                                StatRow(label = "Air Quality", value = "2", desc = "Good")
+                                StatRow(
+                                    label = "Air Quality",
+                                    value = getAirQuality(reading?.co2 ?: 0.0),
+                                    desc = getAirQualityDesc(reading?.co2 ?: 0.0)
+                                )
+
                                 Divider(color = Color.LightGray.copy(alpha = 0.3f), thickness = 1.dp)
-                                StatRow(label = "Humidity", value = "91%")
+
+                                StatRow(
+                                    label = "Humidity",
+                                    value = "${reading?.humidity?.toInt() ?: "--"}%"
+                                )
                                 Divider(color = Color.LightGray.copy(alpha = 0.3f), thickness = 1.dp)
-                                StatRow(label = "CO₂", value = "2.77 ppm")
+                                StatRow(
+                                    label = "CO₂",
+                                    value = "${reading?.co2?.toInt() ?: "--"} ppm"
+                                )
                                 Divider(color = Color.LightGray.copy(alpha = 0.3f), thickness = 1.dp)
-                                StatRow(label = "% Chance of Mould", value = "less than 10%")
+                                StatRow(
+                                    label = "% Chance of Mould",
+                                    value = getMouldRisk(reading?.humidity ?: 0.0)
+                                )
                             }
                         }
                     }
@@ -136,6 +162,29 @@ fun DeviceDashboardScreen(
     }
 }
 
+fun getAirQuality(co2: Double): String {
+    return when {
+        co2 < 800 -> "Good"
+        co2 < 1200 -> "Moderate"
+        else -> "Poor"
+    }
+}
+
+fun getAirQualityDesc(co2: Double): String {
+    return when {
+        co2 < 800 -> "Good"
+        co2 < 1200 -> "Okay"
+        else -> "Bad"
+    }
+}
+
+fun getMouldRisk(humidity: Double): String {
+    return when {
+        humidity < 60 -> "Low"
+        humidity < 75 -> "Moderate"
+        else -> "High"
+    }
+}
 @Composable
 fun StatRow(label: String, value: String, desc: String? = null) {
     Column(

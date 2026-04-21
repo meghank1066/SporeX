@@ -30,3 +30,16 @@ data class BasicResponse(
     val success: Boolean,
     val message: String
 )
+data class ReadingResponse(
+    val device_id: String,
+    val co2: Double,
+    val temp_c: Double,
+    val humidity: Double,
+    val created_at: String
+)
+
+
+data class ScanResponse(
+    val mould_detected: Boolean,
+    val max_confidence: Double?
+)

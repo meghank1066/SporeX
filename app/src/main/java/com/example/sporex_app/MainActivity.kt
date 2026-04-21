@@ -13,7 +13,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.sporex_app.ui.navigation.BottomNavBar
 import com.example.sporex_app.ui.theme.SPOREX_AppTheme
 import android.content.Intent
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +24,8 @@ import com.example.sporex_app.ui.components.ProductsActivity
 import com.example.sporex_app.ui.components.HistoryActivity
 import com.example.sporex_app.ui.screens.HomeScreen
 import com.example.sporex_app.utils.isDarkMode
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.ScaffoldDefaults.contentWindowInsets
 import com.example.sporex_app.utils.setDarkMode
 
 class MainActivity : ComponentActivity() {
@@ -30,7 +34,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
 
         setContent {
             val context = LocalContext.current
@@ -39,10 +43,12 @@ class MainActivity : ComponentActivity() {
             SPOREX_AppTheme(darkTheme = isDarkMode) {
                 Scaffold(
                     containerColor = MaterialTheme.colorScheme.background,
-                    bottomBar = { BottomNavBar(currentScreen = "home") }
-                ) {
+                    bottomBar = { BottomNavBar(currentScreen = "home") },
+                    contentWindowInsets = WindowInsets.safeDrawing // 👈 THIS LINE FIXES IT
+                ) { innerPadding -> // 1. Name the padding values here
                     HomeScreen(
-                        modifier = Modifier,
+                        // 2. Apply the padding to the modifier
+                        modifier = Modifier.padding(innerPadding),
                         onUploadClick = {
                             context.startActivity(Intent(context, UploadActivity::class.java))
                         },

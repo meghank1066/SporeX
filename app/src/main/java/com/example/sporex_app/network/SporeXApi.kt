@@ -13,6 +13,21 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.DELETE
+
+data class ScanHistoryDto(
+    val id: String,
+    val user_email: String? = null,
+    val original_filename: String? = null,
+    val stored_filename: String? = null,
+    val annotated_filename: String? = null,
+    val content_type: String? = null,
+    val mould_detected: Boolean = false,
+    val max_confidence: Double? = null,
+    val image_url: String? = null,
+    val message: String? = null,
+    val created_at: String? = null
+)
 
 interface SporexApi {
 
@@ -55,10 +70,25 @@ interface SporexApi {
         @Body body: CreateReplyRequest
     ): Response<BasicResponse>
 
+    @GET("api/scans/{email}")
+    suspend fun getUserScans(
+        @Path("email") email: String
+    ): Response<List<ScanHistoryDto>>
+
     @Multipart
     @POST("api/predict")
     suspend fun predictImage(
         @Part file: MultipartBody.Part,
         @Part("email") email: RequestBody? = null
     ): Response<PredictResponseDto>
+
+    @DELETE("api/scans/{scanId}")
+    suspend fun deleteScan(        @Path("scanId") scanId: String
+    ): Response<BasicResponse>
+
+    @GET("api/readings/latest")
+    suspend fun getLatestReading(): ReadingResponse
+
+    @GET("api/scans/latest")
+    suspend fun getLatestScan(): ScanResponse
 }

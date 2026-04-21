@@ -1,5 +1,6 @@
 package com.example.sporex_app.ui.components
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -61,8 +62,6 @@ class ConfirmationActivity : ComponentActivity() {
             SPOREX_AppTheme(darkTheme = darkMode) {
                 Scaffold(
                     bottomBar = { BottomNavBar(currentScreen = "camera") },
-                    // Use theme color instead of Color.White
-//                    containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ) { padding ->
 
                     val bottomPadding = padding.calculateBottomPadding()
@@ -98,8 +97,16 @@ class ConfirmationActivity : ComponentActivity() {
                                                     val uri = Uri.parse(uriString)
                                                     val filePart = uriToMultipart(activity, uri)
 
-                                                    val emailPart = "test@example.com"
-                                                        .toRequestBody("text/plain".toMediaTypeOrNull())
+                                                    val userEmail = activity
+                                                        .getSharedPreferences("auth", Context.MODE_PRIVATE)
+                                                        .getString("user_email", "")
+                                                        .orEmpty()
+
+                                                    val emailPart = if (userEmail.isNotBlank()) {
+                                                        userEmail.toRequestBody("text/plain".toMediaTypeOrNull())
+                                                    } else {
+                                                        null
+                                                    }
 
                                                     val response = RetrofitClient.api.predictImage(
                                                         file = filePart,
@@ -113,18 +120,9 @@ class ConfirmationActivity : ComponentActivity() {
                                                             activity,
                                                             ResultActivity::class.java
                                                         ).apply {
-                                                            putExtra(
-                                                                "mould_detected",
-                                                                result.mould_detected
-                                                            )
-                                                            putExtra(
-                                                                "max_confidence",
-                                                                result.max_confidence ?: 0.0
-                                                            )
-                                                            putExtra(
-                                                                "image_url",
-                                                                result.image_url ?: ""
-                                                            )
+                                                            putExtra("mould_detected", result.mould_detected)
+                                                            putExtra("max_confidence", result.max_confidence ?: 0.0)
+                                                            putExtra("image_url", result.image_url ?: "")
                                                             putExtra("message", result.message)
                                                         }
                                                         activity.startActivity(intent)
@@ -176,7 +174,6 @@ class ConfirmationActivity : ComponentActivity() {
             Text(
                 text = "Review Your Photo",
                 style = MaterialTheme.typography.headlineSmall,
-                // Use onSurface so it flips between black/white automatically
                 color = MaterialTheme.colorScheme.surface
             )
 
@@ -229,7 +226,6 @@ class ConfirmationActivity : ComponentActivity() {
                         .height(52.dp),
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(
-                        // Use secondary or surface variant for a "lesser" action
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -238,6 +234,7 @@ class ConfirmationActivity : ComponentActivity() {
                 }
 
                 Spacer(Modifier.width(16.dp))
+
                 Button(
                     onClick = {
                         if (imageUri != null && !isLoading) {
