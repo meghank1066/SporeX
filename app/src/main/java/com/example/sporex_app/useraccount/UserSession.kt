@@ -1,6 +1,7 @@
 package com.example.sporex_app.useraccount
 
 import android.content.Context
+import androidx.core.content.edit
 
 object UserSession {
     private const val PREFS = "sporex_user_session"
@@ -9,10 +10,10 @@ object UserSession {
 
     fun saveUser(context: Context, username: String?, email: String?) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_USERNAME, username ?: "")
-            .putString(KEY_EMAIL, email ?: "")
-            .apply()
+            .edit {
+                putString(KEY_USERNAME, username ?: "")
+                    .putString(KEY_EMAIL, email ?: "")
+            }
     }
 
     fun getUsername(context: Context): String {
@@ -27,8 +28,8 @@ object UserSession {
 
     fun clear(context: Context) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit()
-            .clear()
-            .apply()
+            .edit {
+                clear()
+            }
     }
 }

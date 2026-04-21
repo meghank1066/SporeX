@@ -312,9 +312,11 @@ fun CommunityPostCard(
                     }
 
 
-                TextButton(onClick = onDelete) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
-                }
+                    if (showDelete) {
+                        TextButton(onClick = onDelete) {
+                            Text("Delete", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
                 }
             }
         }

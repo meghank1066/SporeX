@@ -27,6 +27,7 @@ import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import com.example.sporex_app.useraccount.UserSession
 import com.example.sporex_app.utils.isDarkMode
+import kotlinx.coroutines.launch
 
 class CreatePostActivity : ComponentActivity() {
 
@@ -139,12 +140,30 @@ fun CreatePostScreen(
 
                 Button(
                     onClick = {
-                        val activity = context as? Activity ?: return@Button
-                        val resultIntent = Intent().apply {
-                            putExtra("post_content", postContent)
+                        scope.launch {
+                            loading = true
+                            error = null
+                            try {
+                                val res = RetrofitClient.api.createPost(
+                                    CreatePostRequest(
+                                        user_name = currentUsername,
+                                        post_name = "Post",
+                                        content = postContent
+                                    )
+                                )
+
+                                if (res.isSuccessful) {
+                                    activity?.setResult(Activity.RESULT_OK)
+                                    activity?.finish()
+                                } else {
+                                    error = "Failed to create post (${res.code()})"
+                                }
+                            } catch (e: Exception) {
+                                error = "Network error: ${e.localizedMessage ?: "Unknown error"}"
+                            } finally {
+                                loading = false
+                            }
                         }
-                        activity.setResult(Activity.RESULT_OK, resultIntent)
-                        activity.finish()
                     },
                     enabled = postContent.isNotBlank() && !loading,
                     modifier = Modifier
