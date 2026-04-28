@@ -504,6 +504,23 @@ async def add_reply(post_id: str, body: ReplyCreateBody):
 
     return {"success": True, "message": "Reply added to post"}
 
+@app.delete("/api/posts/{post_id}", response_model=BasicResponse)
+async def delete_post(post_id: str):
+    from bson import ObjectId
+    try:
+        post_id_obj = ObjectId(post_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid post ID")
+
+    result = posts_col.delete_one({"_id": post_id_obj})
+
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    return {
+        "success": True,
+        "message": "Post deleted"
+    }
 
 # ---------- AI image prediction ----------
 @app.post("/api/predict", response_model=PredictResponse)
