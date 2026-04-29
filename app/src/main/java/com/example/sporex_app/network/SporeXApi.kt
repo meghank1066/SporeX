@@ -91,4 +91,9 @@ interface SporexApi {
 
     @GET("api/scans/latest")
     suspend fun getLatestScan(): ScanResponse
+
+    @DELETE("api/posts/{postId}")
+    suspend fun deletePost(
+        @Path("postId") postId: String
+    ): Response<BasicResponse>
 }

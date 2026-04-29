@@ -3,6 +3,7 @@ package com.example.sporex_app.ui.community
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -38,7 +40,7 @@ import com.example.sporex_app.useraccount.UserSession
 
 class CommunityHP : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -81,7 +83,7 @@ class CommunityHP : ComponentActivity() {
                 val createPostLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.StartActivityForResult()
                 ) { result ->
-                    if (result.resultCode == Activity.RESULT_OK) {
+                    if (result.resultCode == RESULT_OK) {
                         loadPosts()
                     }
                 }
@@ -130,7 +132,7 @@ class CommunityHP : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .background(colorResource(id = R.color.sporex_green)),
-                                    contentAlignment = androidx.compose.ui.Alignment.Center
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     CircularProgressIndicator()
                                 }
@@ -142,7 +144,7 @@ class CommunityHP : ComponentActivity() {
                                         .fillMaxSize()
                                         .background(colorResource(id = R.color.sporex_green))
                                         .padding(16.dp),
-                                    contentAlignment = androidx.compose.ui.Alignment.Center
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = error ?: "Unknown error",
@@ -172,7 +174,19 @@ class CommunityHP : ComponentActivity() {
                                             }
                                         }
                                     },
-                                    onRefresh = { loadPosts() }
+                                    onDeletePost = { postId ->
+                                        scope.launch {
+                                            try {
+                                                val res = RetrofitClient.api.deletePost(postId);                                                if (res.isSuccessful) {
+                                                    loadPosts()
+                                                } else {
+                                                    error = "Failed to delete post (${res.code()})"
+                                                }
+                                            } catch (e: Exception) {
+                                                error = "Delete error: ${e.localizedMessage ?: "Unknown error"}"
+                                            }
+                                        }
+                                    }
                                 )
                             }
                         }
@@ -190,7 +204,7 @@ fun CommunityScreen(
     posts: List<PostResponse>,
     currentUsername: String,
     onAddReply: (String, String) -> Unit,
-    onRefresh: () -> Unit
+    onDeletePost: (String) -> Unit
 ) {
     var selectedPost by remember { mutableStateOf<PostResponse?>(null) }
     var filter by remember { mutableStateOf("Popular") }
@@ -227,7 +241,7 @@ fun CommunityScreen(
                         // local only for now
                     },
                     onDelete = {
-                        // backend has no delete yet
+                        onDeletePost(backendPost.id)
                     },
                     onViewFull = {
                         selectedPost = backendPost
@@ -409,6 +423,6 @@ fun CommunityScreenPreview() {
         ),
         currentUsername = "Preview",
         onAddReply = { _, _ -> },
-        onRefresh = { }
+        onDeletePost = { }
     )
 }
