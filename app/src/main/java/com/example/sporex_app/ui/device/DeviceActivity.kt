@@ -33,22 +33,34 @@ class DeviceActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
                         startDestination = DeviceScreen.DeviceDashboard.route
+
                     ) {
 
-                        composable("device") {
-                            DeviceDashboardScreen(
-                                deviceName = "Living Room Sensor",
-                                onManageDeviceClick = {
-                                    navController.navigate("manage_device")
-                                },
-                                onCreateDeviceClick = {
-                                    navController.navigate("create_device")
+
+//                        composable("device") {
+//                            DeviceDashboardScreen(
+//                                deviceName = "Living Room Sensor",
+//                                onManageDeviceClick = {
+//                                    navController.navigate("manage_device")
+//                                },
+//                                onCreateDeviceClick = {
+//                                    navController.navigate("create_device")
+//                                }
+//
+//                            )
+//                        }
+
+                        composable(DeviceScreen.DeviceDetails.route) {
+                            DeviceDetailsScreen(
+                                deviceName = repo.getDeviceName(),
+                                onConnectClick = { code ->
+                                    println("Pairing with code: $code")
                                 }
                             )
                         }
 
 
-                        composable("create_device") {
+                        composable(DeviceScreen.CreateDevice.route) {
                             CreateDeviceScreen(
                                 onCreateClick = { deviceName ->
                                     navController.popBackStack()
@@ -65,8 +77,7 @@ class DeviceActivity : ComponentActivity() {
                                     navController.navigate(DeviceScreen.DeviceEdit.route)
                                 },
                                 onCreateDeviceClick = {
-                                    navController.navigate("create_device")
-                                }
+                                    navController.navigate(DeviceScreen.CreateDevice.route) }
                             )
                         }
 
@@ -83,6 +94,9 @@ class DeviceActivity : ComponentActivity() {
                                 },
                                 onTestConnectionClick = {
                                     navController.navigate(DeviceScreen.TestConnection.route)
+                                },
+                                onDeviceDetailsClick = {
+                                    navController.navigate(DeviceScreen.DeviceDetails.route)
                                 }
                             )
                         }

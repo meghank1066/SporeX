@@ -8,6 +8,7 @@ sealed class DeviceScreen(val route: String) {
 
     object TestConnection : DeviceScreen("test_connection")
 
+    object DeviceDetails : DeviceScreen("device_details")
 
-
+    object CreateDevice : DeviceScreen("create_device")
 }

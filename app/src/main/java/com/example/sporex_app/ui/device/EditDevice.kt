@@ -21,8 +21,9 @@ fun EditDeviceScreen(
     deviceName: String,
     onRename: (String) -> Unit,
     onBackClick: () -> Unit,
+    onDeviceDetailsClick: () -> Unit,
+    onTestConnectionClick: () -> Unit,
 
-    onTestConnectionClick: () -> Unit
 ) {
     var showRenameDialog by remember { mutableStateOf(false) }
 
@@ -67,7 +68,9 @@ fun EditDeviceScreen(
                 // Settings
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     SettingItem("Edit Device Name") { showRenameDialog = true }
-                    SettingItem("Device Details") { /* TODO */ }
+                    SettingItem("Device Details") {
+                        onDeviceDetailsClick()
+                    }
                     SettingItem("Test Connection") {  onTestConnectionClick() }
                 }
 
