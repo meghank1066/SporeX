@@ -21,6 +21,7 @@ fun EditDeviceScreen(
     deviceName: String,
     onRename: (String) -> Unit,
     onBackClick: () -> Unit,
+    repo: DeviceRepository,
     onDeviceDetailsClick: () -> Unit,
     onTestConnectionClick: () -> Unit,
 
@@ -82,7 +83,13 @@ fun EditDeviceScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
-                        onClick = { /* TODO: Reset */ },
+                        onClick = {
+                            // RESET (soft refresh)
+                            val id = repo.getDeviceId()
+                            if (id != null) {
+                                repo.setDeviceId(id)
+                            }
+                        },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(
@@ -94,7 +101,10 @@ fun EditDeviceScreen(
                     }
 
                     Button(
-                        onClick = { /* TODO: Remove */ },
+                        onClick = {
+                            repo.clearDevice()
+                            onBackClick()
+                        },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(

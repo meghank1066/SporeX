@@ -17,10 +17,8 @@ import com.example.sporex_app.ui.navigation.TopBar
 fun DeviceDetailsScreen(
     deviceName: String,
     firmwareVersion: String = "2.3.1",
-    model: String = deviceName,
-    onConnectClick: (String) -> Unit = {}
+    model: String = deviceName
 ) {
-    var pairingCode by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(
         topBar = { TopBar() },
@@ -31,96 +29,80 @@ fun DeviceDetailsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(
-                    top = padding.calculateTopPadding(),
-                    bottom = padding.calculateBottomPadding(),
-                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = padding.calculateEndPadding(LayoutDirection.Ltr)
-                )
+                .background(MaterialTheme.colorScheme.background)
+                .padding(padding)
         ) {
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
                 Text(
                     text = deviceName,
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
-                // DEVICE STATUS CARD
+                Text(
+                    text = "Device Information",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Card(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
 
                     Column(
                         modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
 
                         Text(
                             text = "Device Details",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
-                        Text(
-                            text = "Name: $deviceName",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Divider()
 
-                        Text(
-                            text = "Model: $model",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Text(
-                            text = "Firmware: $firmwareVersion",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // PAIRING CODE INPUT
-                        OutlinedTextField(
-                            value = pairingCode,
-                            onValueChange = { pairingCode = it },
-                            label = { Text("Enter pairing code") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Text(
-                            text = "Use the code displayed on your device to connect.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Button(
-                            onClick = { onConnectClick(pairingCode.text) },
-                            shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                contentColor = MaterialTheme.colorScheme.onSecondary
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Connect Device")
-                        }
+                        DetailRow("Name", deviceName)
+                        DetailRow("Model", model)
+                        DetailRow("Firmware", firmwareVersion)
+                        DetailRow("Status", "Online")
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
     }
 }

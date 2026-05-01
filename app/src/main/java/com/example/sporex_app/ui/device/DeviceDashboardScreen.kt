@@ -1,5 +1,6 @@
 package com.example.sporex_app.ui.device
 
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,20 +23,39 @@ import com.example.sporex_app.ui.navigation.TopBar
 @Composable
 fun DeviceDashboardScreen(
     deviceName: String,
+    repo: DeviceRepository,
     onManageDeviceClick: () -> Unit,
     onCreateDeviceClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(true) }
+    val isPaired = repo.isDevicePaired()
 
-    var reading by remember { mutableStateOf<ReadingResponse?>(null) }
+    var reading by remember {
+        mutableStateOf<ReadingResponse?>(null)
+    }
 
-    LaunchedEffect(Unit) {
-        try {
-            reading = RetrofitClient.api.getLatestReading()
-        } catch (e: Exception) {
-            e.printStackTrace()
+    LaunchedEffect(isPaired) {
+        if (!isPaired) {
+            reading = null
+            return@LaunchedEffect
+        }
+
+        while (true) {
+            if (!isPaired) break
+
+            try {
+                reading = RetrofitClient.api.getLatestReading()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            delay((3000 + (0..2000).random()).toLong())
         }
     }
+
+
+
+
     Scaffold(
         bottomBar = { BottomNavBar(currentScreen = "device") },
         containerColor = MaterialTheme.colorScheme.primary,
@@ -68,6 +88,28 @@ fun DeviceDashboardScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 TopBar()
+
+                if (!isPaired) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No Device Connected",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Button(onClick = onCreateDeviceClick) {
+                            Text("Add Device")
+                        }
+                    }
+                    return@Column
+                }
 
                 Column(
                     modifier = Modifier
@@ -106,12 +148,12 @@ fun DeviceDashboardScreen(
                                 Text(
                                     "Basic Readings",
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                                 Icon(
                                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                                     contentDescription = "Expand",
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
 

@@ -14,5 +14,21 @@ class DeviceRepository(context: Context) {
         prefs.edit().putString("device_name", name).apply()
     }
 
+    fun setDeviceId(id: String) {
+        prefs.edit().putString("device_id", id).apply()
+    }
 
+    fun getDeviceId(): String? =
+        prefs.getString("device_id", null)
+
+    fun isDevicePaired(): Boolean =
+        !getDeviceId().isNullOrBlank()
+
+    fun clearDevice() {
+        prefs.edit().remove("device_id").apply()
+    }
+
+    fun touchDevice() {
+        prefs.edit().putLong("device_refresh", System.currentTimeMillis()).apply()
+    }
 }

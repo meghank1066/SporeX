@@ -32,8 +32,8 @@ class DeviceActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = DeviceScreen.DeviceDashboard.route
-
+//                        startDestination = DeviceScreen.DeviceDashboard.route
+                        startDestination = "root"
                     ) {
 
 
@@ -52,18 +52,22 @@ class DeviceActivity : ComponentActivity() {
 
                         composable(DeviceScreen.DeviceDetails.route) {
                             DeviceDetailsScreen(
-                                deviceName = repo.getDeviceName(),
-                                onConnectClick = { code ->
-                                    println("Pairing with code: $code")
-                                }
+                                deviceName = repo.getDeviceName()
                             )
                         }
 
 
                         composable(DeviceScreen.CreateDevice.route) {
                             CreateDeviceScreen(
-                                onCreateClick = { deviceName ->
-                                    navController.popBackStack()
+                                onCreateClick = { deviceCode ->
+
+                                    //saves device
+                                      repo.setDeviceId(deviceCode)
+
+                                    //goes to root
+                                     navController.navigate("root") {
+                                        popUpTo("root") { inclusive = true }
+                                    }
                                 }
                             )
                         }
@@ -73,6 +77,7 @@ class DeviceActivity : ComponentActivity() {
                         composable(DeviceScreen.DeviceDashboard.route) {
                             DeviceDashboardScreen(
                                 deviceName = repo.getDeviceName(),
+                                repo = repo,
                                 onManageDeviceClick = {
                                     navController.navigate(DeviceScreen.DeviceEdit.route)
                                 },
@@ -86,6 +91,7 @@ class DeviceActivity : ComponentActivity() {
                         composable(DeviceScreen.DeviceEdit.route) {
                             EditDeviceScreen(
                                 deviceName = repo.getDeviceName(),
+                                repo = repo,
                                 onRename = { newName ->
                                     repo.setDeviceName(newName)
                                 },
@@ -112,9 +118,34 @@ class DeviceActivity : ComponentActivity() {
                             )
                         }
 
+                        //router for direction of app
+                        composable("root") {
+
+                            val isPaired = repo.isDevicePaired()
+
+                            if (isPaired) {
+                                DeviceDashboardScreen(
+                                    deviceName = repo.getDeviceName(),
+                                    repo = repo,
+                                    onManageDeviceClick = {
+                                        navController.navigate(DeviceScreen.DeviceEdit.route)
+                                    },
+                                    onCreateDeviceClick = {
+                                        navController.navigate(DeviceScreen.CreateDevice.route)
+                                    }
+                                )
+                            } else {
+                                DefaultDevice(
+                                    onAddDeviceClick = {
+                                        navController.navigate(DeviceScreen.CreateDevice.route)
+                                    }
+                                )
+                            }
+                        }
+                        }
+
                     }
                 }
             }
         }
     }
-}
