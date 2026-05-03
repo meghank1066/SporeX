@@ -83,6 +83,7 @@ ANNOTATED_DIR = BASE_DIR / "annotated"
 UPLOAD_DIR.mkdir(exist_ok=True)
 ANNOTATED_DIR.mkdir(exist_ok=True)
 
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 app.mount("/static", StaticFiles(directory=str(ANNOTATED_DIR)), name="static")
 
 
@@ -352,7 +353,7 @@ async def update_profile(
         with path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        update_data["profile_image"] = f"/static/{file_id}"
+        update_data["profile_image"] = f"/uploads/{file_id}"
 
     users_col.update_one(
         {"email": email},
