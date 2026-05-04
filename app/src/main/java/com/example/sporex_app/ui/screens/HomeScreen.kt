@@ -200,6 +200,7 @@ private fun PreviousCaseCard(
 
             Column(modifier = Modifier.weight(1f)) {
 
+
                 Text(
                     text = "Previous Case",
                     fontWeight = FontWeight.Bold,
